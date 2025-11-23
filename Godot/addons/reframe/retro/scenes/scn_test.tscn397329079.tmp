@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3 uid="uid://cqku3wvu6412f"]
+
+[ext_resource type="ArrayMesh" uid="uid://cl80o1ow8rxrj" path="res://addons/reframe/retro/crate/crate.obj" id="2_aasu7"]
+[ext_resource type="Script" uid="uid://bhnkoyl1r324y" path="res://addons/reframe/retro/scripts/src_reframe_retro_settings.gd" id="2_qeyob"]
+[ext_resource type="Shader" uid="uid://x85xdsx2dvb8" path="res://addons/reframe/retro/shaders/shader_reframe_retro_postprocessing.gdshader" id="3_2ox63"]
+
+[node name="Node3D6" type="Node3D" unique_id=931357949]
+
+[node name="Crate" type="MeshInstance3D" parent="." unique_id=2050143875]
+transform = Transform3D(0.047838733, 0, 0.99885505, 0, 1, 0, -0.99885505, 0, 0.047838733, 0.58276093, 0, 0.5258994)
+mesh = ExtResource("2_aasu7")
+
+[node name="ReframeRetroSettings" type="Node3D" parent="." unique_id=1391313712]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.3020208)
+script = ExtResource("2_qeyob")
+post_process_shader = ExtResource("3_2ox63")
+metadata/_custom_type_script = "uid://bhnkoyl1r324y"
