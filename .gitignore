@@ -50,7 +50,12 @@ Unreal/Binaries/*
 Unreal/Plugins/**/Binaries/*
 
 # Builds
-Unreal/Build/*
+Build/
+Builds/
+Unreal/Build/
+Unreal/Builds/
+Godot/Build/
+Godot/Builds/
 
 # Whitelist PakBlacklist-<BuildConfiguration>.txt files
 !Build/*/
