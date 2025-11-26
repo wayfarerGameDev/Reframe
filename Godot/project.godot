@@ -15,15 +15,9 @@ run/main_scene="uid://bstmic73abm6k"
 config/features=PackedStringArray("4.6", "Mobile")
 config/icon="res://icon.svg"
 
-[display]
-
-window/size/viewport_width=1280
-window/size/viewport_height=960
-window/stretch/mode="viewport"
-
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/reframe/plugin.cfg")
+enabled=PackedStringArray("res://addons/reframe/plugin.cfg", "res://addons/sk_fly_camera/plugin.cfg")
 
 [physics]
 
@@ -31,5 +25,6 @@ enabled=PackedStringArray("res://addons/reframe/plugin.cfg")
 
 [rendering]
 
-shading/overrides/force_vertex_shading=true
+renderer/rendering_method="mobile"
+textures/vram_compression/import_etc2_astc=true
 anti_aliasing/screen_space_roughness_limiter/enabled=false

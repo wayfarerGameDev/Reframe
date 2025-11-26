@@ -1,0 +1,78 @@
+[gd_scene load_steps=5 format=3 uid="uid://bpfmunsh25v5l"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_t3uy1"]
+emission_shape_offset = Vector3(0, 4, 0)
+emission_shape_scale = Vector3(20, 5, 20)
+emission_shape = 3
+emission_box_extents = Vector3(1, 1, 1)
+direction = Vector3(2.5, -1, -0.1)
+spread = 21.774
+initial_velocity_min = 8.0
+initial_velocity_max = 13.5
+gravity = Vector3(0, 0, 0)
+turbulence_noise_strength = 0.1
+turbulence_influence_min = 0.251
+turbulence_influence_max = 0.298
+
+[sub_resource type="Shader" id="Shader_itfy5"]
+code = "shader_type spatial;
+render_mode unshaded, fog_disabled;
+
+// Locals
+uniform bool billboard = true;
+
+void vertex()
+{
+	// Billboard
+	// I guess particles need to use matrix for it to work and not effect vertex directly???
+	if (billboard)
+	{
+    	vec3 cam_right   = normalize(INV_VIEW_MATRIX[0].xyz);
+		vec3 cam_up      = normalize(INV_VIEW_MATRIX[1].xyz);
+		vec3 cam_forward = -normalize(INV_VIEW_MATRIX[2].xyz);
+		vec4 obj_position = MODEL_MATRIX[3];
+		mat4 mat_world = mat4(
+		    vec4(cam_right, 0.0),
+		    vec4(cam_up, 0.0),
+		    vec4(cam_forward, 0.0),
+		    obj_position
+		);
+
+		MODELVIEW_MATRIX = VIEW_MATRIX * mat_world;
+		MODELVIEW_NORMAL_MATRIX = mat3(MODELVIEW_MATRIX);
+    }
+}
+
+void fragment()
+{
+    ALBEDO = vec3(1,1,1);
+}
+
+void light()
+{
+	DIFFUSE_LIGHT = vec3(1);
+	SPECULAR_LIGHT = vec3(0);
+}"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_6c344"]
+render_priority = 0
+shader = SubResource("Shader_itfy5")
+shader_parameter/billboard = true
+
+[sub_resource type="QuadMesh" id="QuadMesh_m6hqo"]
+lightmap_size_hint = Vector2i(2, 2)
+material = SubResource("ShaderMaterial_6c344")
+size = Vector2(0.075, 0.075)
+
+[node name="ReframeRetroParticleSnow" type="Node3D" unique_id=700720872]
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="." unique_id=903444562]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.99961, 0)
+amount = 15000
+amount_ratio = 0.3
+lifetime = 2.0
+preprocess = 1.0
+speed_scale = 1.1
+interpolate = false
+process_material = SubResource("ParticleProcessMaterial_t3uy1")
+draw_pass_1 = SubResource("QuadMesh_m6hqo")
