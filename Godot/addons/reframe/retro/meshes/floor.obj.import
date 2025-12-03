@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://b7150efvdpykr"
+path="res://.godot/imported/floor.obj-c07a0bb5c53e1fe6b87fd3054d961717.mesh"
+
+[deps]
+
+files=["res://.godot/imported/floor.obj-c07a0bb5c53e1fe6b87fd3054d961717.mesh"]
+
+source_file="res://addons/reframe/retro/meshes/floor.obj"
+dest_files=["res://.godot/imported/floor.obj-c07a0bb5c53e1fe6b87fd3054d961717.mesh", "res://.godot/imported/floor.obj-c07a0bb5c53e1fe6b87fd3054d961717.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=false
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

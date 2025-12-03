@@ -75,17 +75,17 @@ void fragment()
 	// UV
 	vec2 uv = UV;
 
-    // Repeat texture
+	// Affine texture mapping
+	// PS1 affine uses clip-space W
+	// Undo perspective UVs
+	uv = mix(uv, texture_affine_mapping_uv / clip_space_w, reframe_retro_affine_texture_mapping_strength);
+
+	// Repeat texture
 	if (repeat_factor.x > 0.0 || repeat_factor.y > 0.0)
 	{
    		uv *= repeat_factor;
    		uv = fract(uv);
 	}
-
-	// Affine texture mapping
-	// PS1 affine uses clip-space W
-	// Undo perspective UVs
-	uv = mix(uv, texture_affine_mapping_uv / clip_space_w, reframe_retro_affine_texture_mapping_strength);
 
 	// iUVs
 	// iUV is discrete grid position in retro resolution space, snapped to give blocky look

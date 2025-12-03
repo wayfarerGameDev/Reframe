@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bkaksukvbnvnv"
-path="res://.godot/imported/crate.png-07e09ed9c399d96129c2d44963bd6786.ctex"
+path="res://.godot/imported/tex_reframe_crate.png-2d28c9d1e8645251e6d643dc0157dd63.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/reframe/retro/crate/texture/crate.png"
-dest_files=["res://.godot/imported/crate.png-07e09ed9c399d96129c2d44963bd6786.ctex"]
+source_file="res://addons/reframe/retro/textures/tex_reframe_crate.png"
+dest_files=["res://.godot/imported/tex_reframe_crate.png-2d28c9d1e8645251e6d643dc0157dd63.ctex"]
 
 [params]
 
