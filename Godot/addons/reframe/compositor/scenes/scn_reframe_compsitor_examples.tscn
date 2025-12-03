@@ -1,0 +1,36 @@
+[gd_scene load_steps=8 format=3 uid="uid://jp7wxi1kveij"]
+
+[ext_resource type="Script" uid="uid://dhcwn5t063wu4" path="res://addons/reframe/compositor/scripts/src_reframe_compsitor_effect.gd" id="1_c8ky2"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_lxjri"]
+
+[sub_resource type="Sky" id="Sky_pwjum"]
+sky_material = SubResource("ProceduralSkyMaterial_lxjri")
+
+[sub_resource type="Environment" id="Environment_lxjri"]
+background_mode = 2
+sky = SubResource("Sky_pwjum")
+
+[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_lxjri"]
+
+[sub_resource type="CompositorEffect" id="CompositorEffect_pwjum"]
+resource_local_to_scene = false
+resource_name = ""
+enabled = true
+effect_callback_type = 4
+needs_motion_vectors = false
+needs_normal_roughness = false
+script = ExtResource("1_c8ky2")
+shader_code = "// Grayscale
+color.rgb = vec3(color.r * 0.2125 + color.g * 0.7154 + color.b * 0.0721);"
+metadata/_custom_type_script = "uid://dhcwn5t063wu4"
+
+[sub_resource type="Compositor" id="Compositor_lxjri"]
+compositor_effects = Array[CompositorEffect]([SubResource("CompositorEffect_pwjum")])
+
+[node name="Node3D" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_lxjri")
+camera_attributes = SubResource("CameraAttributesPractical_lxjri")
+compositor = SubResource("Compositor_lxjri")
