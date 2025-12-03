@@ -1,6 +1,6 @@
 @tool
 extends CompositorEffect
-class_name ReframeCompsitorEffect
+class_name ReframeCompsitorEffectCustom
 
 @export_multiline var shader_code: String = "":
 	set(value):

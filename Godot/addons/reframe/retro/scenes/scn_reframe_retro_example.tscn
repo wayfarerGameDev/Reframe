@@ -3,13 +3,13 @@
 [ext_resource type="Script" uid="uid://bhnkoyl1r324y" path="res://addons/reframe/retro/scripts/src_reframe_retro.gd" id="2_5os5h"]
 [ext_resource type="Texture2D" uid="uid://v6l4lv2buemc" path="res://addons/reframe/retro/textures/tex_reframe_retro_dither_matrix_ps1_normalized_4x4.png" id="3_vrpkw"]
 [ext_resource type="Shader" uid="uid://x85xdsx2dvb8" path="res://addons/reframe/retro/shaders/shader_reframe_retro_post_process.gdshader" id="3_ycrtt"]
-[ext_resource type="Script" uid="uid://cte4jalives85" path="res://addons/sk_fly_camera/src/fly_camera.gd" id="4_5fu82"]
+[ext_resource type="Script" uid="uid://cte4jalives85" path="res://addons/reframe/camera/fly_camera.gd" id="4_5fu82"]
 [ext_resource type="PackedScene" uid="uid://bpfmunsh25v5l" path="res://addons/reframe/retro/particles/prt_reframe_retro_snow.tscn" id="4_5os5h"]
 [ext_resource type="Shader" uid="uid://612q4qpqb7gh" path="res://addons/reframe/retro/shaders/shader_reframe_retro_object.gdshader" id="6_m6hqo"]
-[ext_resource type="Texture2D" uid="uid://dbxx8jop17pc1" path="res://addons/reframe/retro/textures/tex_reframe_retro_floor_concrete.PNG" id="7_5fu82"]
+[ext_resource type="Texture2D" uid="uid://bkaksukvbnvnv" path="res://addons/reframe/retro/textures/tex_reframe_crate.png" id="8_syaye"]
 [ext_resource type="ArrayMesh" uid="uid://cl80o1ow8rxrj" path="res://addons/reframe/retro/meshes/crate.obj" id="8_vrpkw"]
-[ext_resource type="Texture2D" uid="uid://bkaksukvbnvnv" path="res://addons/reframe/retro/textures/tex_reframe_crate.png" id="9_np8cf"]
 [ext_resource type="ArrayMesh" uid="uid://b7150efvdpykr" path="res://addons/reframe/retro/meshes/floor.obj" id="9_syaye"]
+[ext_resource type="Texture2D" uid="uid://dbxx8jop17pc1" path="res://addons/reframe/retro/textures/tex_reframe_retro_floor_concrete.PNG" id="10_avdpg"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_pth87"]
 ground_curve = 0.0672719
@@ -31,15 +31,15 @@ glow_enabled = true
 render_priority = 0
 shader = ExtResource("6_m6hqo")
 shader_parameter/billboard = false
-shader_parameter/repeat_factor = Vector2(0, 0)
-shader_parameter/albedo_texture = ExtResource("9_np8cf")
+shader_parameter/repeat_factor = 0.0
+shader_parameter/albedo_texture = ExtResource("8_syaye")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_avdpg"]
 render_priority = 0
 shader = ExtResource("6_m6hqo")
 shader_parameter/billboard = false
-shader_parameter/repeat_factor = Vector2(20, 20)
-shader_parameter/albedo_texture = ExtResource("7_5fu82")
+shader_parameter/repeat_factor = 20.0
+shader_parameter/albedo_texture = ExtResource("10_avdpg")
 
 [node name="Scene" type="Node3D"]
 

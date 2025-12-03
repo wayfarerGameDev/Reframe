@@ -16,7 +16,7 @@ global uniform float reframe_retro_vertex_jitter_strength;
 
 // Locals
 uniform bool billboard = false;
-uniform vec2 repeat_factor = vec2(0,0);
+uniform float repeat_factor = 0;
 uniform sampler2D albedo_texture : source_color, filter_nearest, repeat_disable;
 
 // Dither matrix bassed on ps1 dither matrix
@@ -81,7 +81,7 @@ void fragment()
 	uv = mix(uv, texture_affine_mapping_uv / clip_space_w, reframe_retro_affine_texture_mapping_strength);
 
 	// Repeat texture
-	if (repeat_factor.x > 0.0 || repeat_factor.y > 0.0)
+	if (repeat_factor > 0.0)
 	{
    		uv *= repeat_factor;
    		uv = fract(uv);
@@ -134,4 +134,3 @@ void light()
 	DIFFUSE_LIGHT = vec3(1);
 	SPECULAR_LIGHT = vec3(0);
 }
-
