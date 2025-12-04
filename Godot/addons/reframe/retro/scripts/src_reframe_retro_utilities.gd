@@ -1,19 +1,21 @@
 extends RefCounted
 class_name ReframeRetroUtilities
 
-static func global_shader_parameters_initalize() -> void:
+static func global_shader_parameters_defaults() -> void:
 	# Basic globals
 	global_shader_parameter_set("reframe_retro_resolution_mode", RenderingServer.GLOBAL_VAR_TYPE_INT, 0)
 	global_shader_parameter_set("reframe_retro_resolution", RenderingServer.GLOBAL_VAR_TYPE_VEC2, Vector2.ZERO)
 	global_shader_parameter_set("reframe_retro_color_quantization_mode", RenderingServer.GLOBAL_VAR_TYPE_INT, 0)
 	global_shader_parameter_set("reframe_retro_color_quantization_depth", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, 0)
 	global_shader_parameter_set("reframe_retro_affine_texture_mapping_strength", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, 0)
-	global_shader_parameter_set("reframe_retro_vertex_jitter_strength", RenderingServer.GLOBAL_VAR_TYPE_FLOAT,0)
+	global_shader_parameter_set("reframe_retro_vertex_jitter_strength", RenderingServer.GLOBAL_VAR_TYPE_FLOAT,0.00001)
 	global_shader_parameter_set("reframe_retro_fog_mode", RenderingServer.GLOBAL_VAR_TYPE_INT, 0)
 	global_shader_parameter_set("reframe_retro_fog_color", RenderingServer.GLOBAL_VAR_TYPE_VEC4, 0)
 	global_shader_parameter_set("reframe_retro_fog_start_end_distance", RenderingServer.GLOBAL_VAR_TYPE_VEC2,Vector2.ZERO)
 	global_shader_parameter_set("reframe_retro_fog_depth_precision", RenderingServer.GLOBAL_VAR_TYPE_INT, Vector2.ZERO)
-	# Dithering
+	global_shader_parameter_set("reframe_retro_light_directional_direction", RenderingServer.GLOBAL_VAR_TYPE_VEC3, Vector3(0,1,0))
+	global_shader_parameter_set("reframe_retro_light_directional_intensity", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, 1)
+	global_shader_parameter_set("reframe_retro_light_directional_color", RenderingServer.GLOBAL_VAR_TYPE_VEC4, Color.BLACK)
 	global_shader_parameter_set("reframe_retro_dithering_mode", RenderingServer.GLOBAL_VAR_TYPE_INT,0)
 	global_shader_parameter_set_texture("reframe_retro_dithering_matrix_texture", null)
 	global_shader_parameter_set("reframe_retro_dithering_matrix_size", RenderingServer.GLOBAL_VAR_TYPE_INT, 0)

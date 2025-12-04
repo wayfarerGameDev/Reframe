@@ -4,7 +4,7 @@ extends EditorPlugin
 var editor_control
 
 func _enter_tree():
-	ReframeRetroUtilities.global_shader_parameters_initalize()
+	ReframeRetroUtilities.global_shader_parameters_defaults()
 	pass
 
 func _exit_tree():

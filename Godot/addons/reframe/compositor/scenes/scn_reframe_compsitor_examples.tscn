@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://jp7wxi1kveij"]
+[gd_scene load_steps=11 format=3 uid="uid://jp7wxi1kveij"]
 
 [ext_resource type="Script" uid="uid://dhcwn5t063wu4" path="res://addons/reframe/compositor/scripts/src_reframe_compsitor_effect_custom.gd" id="1_c8ky2"]
 [ext_resource type="Script" uid="uid://cte4jalives85" path="res://addons/reframe/camera/fly_camera.gd" id="2_c6avi"]
@@ -26,8 +26,43 @@ shader_code = "// Grayscale
 color.rgb = vec3(color.r * 0.2125 + color.g * 0.7154 + color.b * 0.0721);"
 metadata/_custom_type_script = "uid://dhcwn5t063wu4"
 
+[sub_resource type="CompositorEffect" id="CompositorEffect_c6avi"]
+resource_local_to_scene = false
+resource_name = ""
+enabled = true
+effect_callback_type = 4
+needs_motion_vectors = false
+needs_normal_roughness = false
+script = ExtResource("1_c8ky2")
+shader_code = "// Vignette
+float radius = 2;
+float softness = 3;
+
+// Convert pixel coordinates (uv) to normalized coordinates (-1 to 1)
+// Calculate the squared distance from the center
+vec2 normalized_uv = (vec2(uv) / params.raster_size) * 2.0 - 1.0;
+float dist_sq = dot(normalized_uv, normalized_uv);
+
+// Effect
+float vignette_factor = smoothstep(radius, radius - softness, dist_sq);
+color.rgb *= vignette_factor;"
+metadata/_custom_type_script = "uid://dhcwn5t063wu4"
+
+[sub_resource type="CompositorEffect" id="CompositorEffect_0sfgl"]
+resource_local_to_scene = false
+resource_name = ""
+enabled = true
+effect_callback_type = 4
+needs_motion_vectors = false
+needs_normal_roughness = false
+script = ExtResource("1_c8ky2")
+shader_code = "//  Pulse
+float pulse = (sin(time * 2.0) + 1.0) / 2.0;
+color.rgb *= pulse;"
+metadata/_custom_type_script = "uid://dhcwn5t063wu4"
+
 [sub_resource type="Compositor" id="Compositor_lxjri"]
-compositor_effects = Array[CompositorEffect]([SubResource("CompositorEffect_pwjum")])
+compositor_effects = Array[CompositorEffect]([SubResource("CompositorEffect_pwjum"), SubResource("CompositorEffect_c6avi"), SubResource("CompositorEffect_0sfgl")])
 
 [node name="Node3D" type="Node3D"]
 

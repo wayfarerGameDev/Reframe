@@ -6,11 +6,11 @@ enum ResolutionMode { Internal, Postprocessing }
 enum Mode { None, Individual, Postprocessing }
 
 # Parameters 
-@export_group("Materials")
-@export var post_processing_material: Material = load("res://addons/reframe/retro/materials/mat_reframe_retro_postprocessing_base.tres")
+@export_group("Shader")
+@export var post_processing_shader: Shader = load("res://addons/reframe/retro/shaders/shader_reframe_retro_post_process.gdshader")
 @export_group("Resolution")
 @export var resolution_mode : ResolutionMode = ResolutionMode.Postprocessing;
-@export var resolution : Vector2i = Vector2i(1152, 648)
+@export var resolution : Vector2i = Vector2i(640, 480)
 @export_group("Affine texture mapping")
 @export var affine_texture_mapping_strength : float = 1
 @export_group("Color")
@@ -27,21 +27,46 @@ enum Mode { None, Individual, Postprocessing }
 @export var fog_color : Color = Color.WHITE
 @export var fog_start_end_distance : Vector2 = Vector2(5,30)
 @export var fog_depth_precision : float = 32
+@export_group("Lighting: Directional")
+@export var light_directional_light : DirectionalLight3D
+@export var light_directional_direction : Vector3 = Vector3(0,1,0);
+@export var light_directional_intensity : float = 1;
+@export var light_directional_color : Color = Color.BLACK;
 	
 var quad_instance: MeshInstance3D
 		
 func _notification(what):
 	if Engine.is_editor_hint():
-		_ready()
-		
+		# Deletion
+		if what == NOTIFICATION_PREDELETE or what == NOTIFICATION_EXIT_WORLD or what == NOTIFICATION_EXIT_TREE:
+			ReframeRetroUtilities.global_shader_parameters_defaults()
+			return
+		# Initalize
+		if  what == NOTIFICATION_ENTER_WORLD or what == NOTIFICATION_ENTER_TREE:
+			project_settings_update()
+			global_shader_parameter_update()
+			post_processing_update()
+		# Property update
+		if what == NOTIFICATION_INTERNAL_PROCESS:
+			# Call your update functions here to ensure new values are applied
+			global_shader_parameter_update()
+			post_processing_update()
+			return
+	
 func _ready() -> void:
+	# Editor (continuous updates)
+	if Engine.is_editor_hint():
+		set_process_internal(true)
+	# Runtime
 	project_settings_update()
 	global_shader_parameter_update()
 	post_processing_update()
 			
-# Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	#project_settings_update()
+	# Set directional light direction
+	if light_directional_light != null:
+		var direction : Vector3 = -(light_directional_light.transform.basis.z).normalized()
+		light_directional_direction = direction
 	pass
 
 func project_settings_update() -> void:
@@ -79,7 +104,10 @@ func global_shader_parameter_update() -> void:
 	ReframeRetroUtilities.global_shader_parameter_set("reframe_retro_fog_color", RenderingServer.GLOBAL_VAR_TYPE_VEC4, fog_color)
 	ReframeRetroUtilities.global_shader_parameter_set("reframe_retro_fog_start_end_distance", RenderingServer.GLOBAL_VAR_TYPE_VEC2, fog_start_end_distance)
 	ReframeRetroUtilities.global_shader_parameter_set("reframe_retro_fog_depth_precision", RenderingServer.GLOBAL_VAR_TYPE_INT, fog_depth_precision)
-
+	ReframeRetroUtilities.global_shader_parameter_set("reframe_retro_light_directional_direction", RenderingServer.GLOBAL_VAR_TYPE_VEC3, light_directional_direction)
+	ReframeRetroUtilities.global_shader_parameter_set("reframe_retro_light_directional_intensity", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, light_directional_intensity)
+	ReframeRetroUtilities.global_shader_parameter_set("reframe_retro_light_directional_color", RenderingServer.GLOBAL_VAR_TYPE_VEC4, light_directional_color)
+	
 	# Dithering
 	ReframeRetroUtilities.global_shader_parameter_set("reframe_retro_dithering_mode", RenderingServer.GLOBAL_VAR_TYPE_INT, dithering_mode)
 	ReframeRetroUtilities.global_shader_parameter_set_texture("reframe_retro_dithering_matrix_texture", dithering_matrix_texture)
@@ -107,4 +135,9 @@ func post_processing_update() -> void:
 	quad_instance.mesh = quad
 	
 	# Material
-	quad_instance.material_override = post_processing_material;
+	if post_processing_shader != null:
+		var mat = ShaderMaterial.new()
+		mat.shader = post_processing_shader
+		quad_instance.material_override = mat
+	else:
+		quad_instance.material_override = null

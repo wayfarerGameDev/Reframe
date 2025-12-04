@@ -17,23 +17,25 @@ var shader_is_dirty: bool = true
 const template_shader: String = """
 #version 450
 
-// Invocations in the (x, y, z) dimension
+// Layout
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
-
 layout(rgba16f, set = 0, binding = 0) uniform image2D color_image;
-
-// Our push constant
-layout(push_constant, std430) uniform Params {
+layout(push_constant, std430) uniform Params 
+{
 	vec2 raster_size;
-	vec2 reserved;
+	vec2 time;
 } params;
 
 // The code we want to execute in each invocation
-void main() {
+void main() 
+{
 	ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
 	ivec2 size = ivec2(params.raster_size);
-
-	if (uv.x >= size.x || uv.y >= size.y) {
+    float time = params.time.x;
+    float time_sin = params.time.y;
+	
+	if (uv.x >= size.x || uv.y >= size.y) 
+	{
 		return;
 	}
 
@@ -112,17 +114,20 @@ func _render_callback(p_effect_callback_type, p_render_data):
 			if size.x == 0 and size.y == 0:
 				return
 
-			# We can use a compute shader here.
+			# Groups
 			var x_groups = (size.x - 1) / 8 + 1
 			var y_groups = (size.y - 1) / 8 + 1
 			var z_groups = 1
+
+			# Get current time in seconds.
+			var time: float = Time.get_ticks_msec() / 1000.0
 
 			# Push constant.
 			var push_constant: PackedFloat32Array = PackedFloat32Array()
 			push_constant.push_back(size.x)
 			push_constant.push_back(size.y)
-			push_constant.push_back(0.0)
-			push_constant.push_back(0.0)
+			push_constant.push_back(time)
+			push_constant.push_back(sin(time))
 
 			# Loop through views just in case we're doing stereo rendering. No extra cost if this is mono.
 			var view_count = render_scene_buffers.get_view_count()

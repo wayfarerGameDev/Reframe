@@ -12,7 +12,9 @@ global uniform sampler2D reframe_retro_dithering_matrix_texture : filter_nearest
 global uniform float reframe_retro_dithering_strength;
 global uniform int   reframe_retro_dithering_matrix_size;
 global uniform float reframe_retro_vertex_jitter_strength;
-
+global uniform vec3 reframe_retro_light_directional_direction;
+global uniform float reframe_retro_light_directional_intensity;
+global uniform vec4 reframe_retro_light_directional_color;
 
 // Locals
 uniform bool billboard = false;
@@ -65,9 +67,17 @@ void vertex()
 	// vec3 jitter_offset = snapped_pos - view_space.xyz;
 	// VERTEX += (inverse(MODEL_MATRIX) * vec4(jitter_offset * view_space.z, 0.0)).xyz * clip_space.w;
 
+	// Light (Directional)
+	// PS1 Per-Vertex Shading (Gouraud shading)
+	float light_dot = clamp(dot(NORMAL,normalize(reframe_retro_light_directional_direction)),0,1);
+	vec4 light = reframe_retro_light_directional_color + reframe_retro_light_directional_intensity * light_dot;
+	vec3 light_factor = clamp(light.rgb,vec3(0),vec3(1));
+
 	// Affine texture mapping
 	// PS1 affine uses clip-space W
+	// Must be applied things like lighting and fog
 	texture_affine_mapping_uv = UV * clip_space_w;
+	COLOR.rgb = light_factor * clip_space_w;
 }
 
 void fragment()
@@ -79,6 +89,7 @@ void fragment()
 	// PS1 affine uses clip-space W
 	// Undo perspective UVs
 	uv = mix(uv, texture_affine_mapping_uv / clip_space_w, reframe_retro_affine_texture_mapping_strength);
+	vec3 vertex_color = mix(COLOR.rgb, COLOR.rgb / clip_space_w,  reframe_retro_affine_texture_mapping_strength);
 
 	// Repeat texture
 	if (repeat_factor > 0.0)
@@ -95,8 +106,8 @@ void fragment()
 	iuv = ivec2(uv * reframe_retro_resolution);
 
 	// Sample the sources
-    vec3 color = texture(albedo_texture, uv).rgb;
-	// float depth = texture(DEPTH_TEXTURE, uv_snapped).r;
+	// Apply lighting and fog
+    vec3 color = texture(albedo_texture, uv).rgb * vertex_color;
 
 	// Dithering (Hard coded matrix)
 	// PS1 style: Scales with quantization step

@@ -1,10 +1,10 @@
 [gd_scene load_steps=17 format=3 uid="uid://bstmic73abm6k"]
 
+[ext_resource type="Shader" uid="uid://x85xdsx2dvb8" path="res://addons/reframe/retro/shaders/shader_reframe_retro_post_process.gdshader" id="2_syaye"]
 [ext_resource type="Script" uid="uid://cte4jalives85" path="res://addons/reframe/camera/fly_camera.gd" id="4_5fu82"]
 [ext_resource type="PackedScene" uid="uid://bpfmunsh25v5l" path="res://addons/reframe/retro/particles/prt_reframe_retro_snow.tscn" id="4_5os5h"]
 [ext_resource type="Shader" uid="uid://612q4qpqb7gh" path="res://addons/reframe/retro/shaders/shader_reframe_retro_object.gdshader" id="6_m6hqo"]
 [ext_resource type="Script" uid="uid://b4eor8xcneiix" path="res://addons/reframe/retro/scripts/src_reframe_retro_settings.gd" id="6_vrpkw"]
-[ext_resource type="Material" uid="uid://gnar75ixmagi" path="res://addons/reframe/retro/materials/mat_reframe_retro_postprocessing_base.tres" id="7_np8cf"]
 [ext_resource type="Texture2D" uid="uid://dbxx8jop17pc1" path="res://addons/reframe/retro/textures/tex_reframe_retro_floor_concrete.PNG" id="8_avdpg"]
 [ext_resource type="Texture2D" uid="uid://cmqjyf7hdfo84" path="res://addons/reframe/retro/textures/tex_reframe_retro_dither_matrix_ps1_4x4.png" id="8_syaye"]
 [ext_resource type="ArrayMesh" uid="uid://cl80o1ow8rxrj" path="res://addons/reframe/retro/meshes/crate.obj" id="9_np8cf"]
@@ -43,13 +43,19 @@ shader_parameter/albedo_texture = ExtResource("10_4gv7g")
 
 [node name="Scene" type="Node3D"]
 
-[node name="ReframeRetroSettings" type="Node3D" parent="."]
+[node name="ReframeRetroSettings" type="Node3D" parent="." node_paths=PackedStringArray("light_directional_light")]
 script = ExtResource("6_vrpkw")
-post_processing_material = ExtResource("7_np8cf")
-resolution = Vector2i(640, 320)
+post_processing_shader = ExtResource("2_syaye")
+resolution = Vector2i(320, 240)
 dithering_matrix_texture = ExtResource("8_syaye")
+vertex_jitter_strength = 20.0
 fog_mode = 0
+light_directional_light = NodePath("../DirectionalLight3D")
+light_directional_direction = Vector3(0.83282876, 0.5226066, -0.18242414)
 metadata/_custom_type_script = "uid://b4eor8xcneiix"
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.50572896, -0.22502103, -0.83282876, -0.58442336, 0.62075084, -0.5226066, 0.6345766, 0.7510219, 0.18242414, 0, 10, 0)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_fu8rj")
