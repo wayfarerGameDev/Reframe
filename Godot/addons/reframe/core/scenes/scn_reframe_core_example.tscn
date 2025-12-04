@@ -1,0 +1,38 @@
+[gd_scene load_steps=9 format=3 uid="uid://wwu8pn5uruxc"]
+
+[ext_resource type="Script" uid="uid://cte4jalives85" path="res://addons/reframe/camera/fly_camera.gd" id="1_6cqyx"]
+[ext_resource type="Script" uid="uid://cl71l0606hyl8" path="res://addons/reframe/core/scripts/src_reframe_core_effect_post_process.gd" id="2_e27uv"]
+[ext_resource type="Shader" uid="uid://dj48uko6x4hun" path="res://addons/reframe/core/shaders/shader_reframe_core_effect_post_process_grayscale.gdshader" id="3_metub"]
+[ext_resource type="Shader" uid="uid://isl4qen30j60" path="res://addons/reframe/core/shaders/shader_reframe_core_effect_post_process_vignette.gdshader" id="4_6cqyx"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_lxjri"]
+
+[sub_resource type="Sky" id="Sky_pwjum"]
+sky_material = SubResource("ProceduralSkyMaterial_lxjri")
+
+[sub_resource type="Environment" id="Environment_lxjri"]
+background_mode = 2
+sky = SubResource("Sky_pwjum")
+
+[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_lxjri"]
+
+[node name="Node3D" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_lxjri")
+camera_attributes = SubResource("CameraAttributesPractical_lxjri")
+
+[node name="FlyCamera" type="CharacterBody3D" parent="."]
+script = ExtResource("1_6cqyx")
+metadata/_custom_type_script = "uid://cte4jalives85"
+
+[node name="ReframeCoreEffectPostProcess_Vignette" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -8.625658)
+script = ExtResource("2_e27uv")
+shader = ExtResource("4_6cqyx")
+metadata/_custom_type_script = "uid://cl71l0606hyl8"
+
+[node name="ReframeCoreEffectPostProcess_Grayscale" type="Node3D" parent="."]
+script = ExtResource("2_e27uv")
+shader = ExtResource("3_metub")
+metadata/_custom_type_script = "uid://cl71l0606hyl8"

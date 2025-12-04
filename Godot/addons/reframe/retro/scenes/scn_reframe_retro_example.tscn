@@ -51,11 +51,11 @@ dithering_matrix_texture = ExtResource("8_syaye")
 vertex_jitter_strength = 20.0
 fog_mode = 0
 light_directional_light = NodePath("../DirectionalLight3D")
-light_directional_direction = Vector3(0.83282876, 0.5226066, -0.18242414)
+light_directional_direction = Vector3(0.37731612, 0.4175012, 0.826635)
 metadata/_custom_type_script = "uid://b4eor8xcneiix"
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.50572896, -0.22502103, -0.83282876, -0.58442336, 0.62075084, -0.5226066, 0.6345766, 0.7510219, 0.18242414, 0, 10, 0)
+transform = Transform3D(-0.8110088, -0.44709885, -0.37731612, -0.28197315, 0.86381936, -0.4175012, 0.51259714, -0.23220412, -0.826635, 0, 10, 0)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_fu8rj")
