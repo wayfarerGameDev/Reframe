@@ -11,13 +11,17 @@ config_version=5
 [application]
 
 config/name="Reframe"
-run/main_scene="uid://bstmic73abm6k"
+run/main_scene="uid://jp7wxi1kveij"
 config/features=PackedStringArray("4.5", "Mobile")
 config/icon="res://icon.svg"
 
+[display]
+
+window/stretch/mode="viewport"
+
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/reframe/plugin.cfg", "res://addons/sk_fly_camera/plugin.cfg")
+enabled=PackedStringArray("res://addons/reframe/plugin.cfg")
 
 [physics]
 

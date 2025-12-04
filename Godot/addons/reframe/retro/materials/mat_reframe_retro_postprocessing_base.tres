@@ -1,0 +1,7 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://gnar75ixmagi"]
+
+[ext_resource type="Shader" uid="uid://x85xdsx2dvb8" path="res://addons/reframe/retro/shaders/shader_reframe_retro_post_process.gdshader" id="1_x87ci"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_x87ci")
