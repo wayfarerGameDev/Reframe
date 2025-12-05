@@ -1,6 +1,6 @@
 @tool
 extends Node3D
-class_name ReframeCoreEffectPostProcess
+class_name ReframeCoreEffect3DPostProcess
 
 # Parameters 
 @export var shader: Shader = load("res://addons/reframe/core/shaders/shader_reframe_core_effect_post_process_grayscale.gdshader")

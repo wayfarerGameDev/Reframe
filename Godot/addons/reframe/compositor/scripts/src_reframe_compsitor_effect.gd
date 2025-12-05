@@ -1,6 +1,6 @@
 @tool
 extends CompositorEffect
-class_name ReframeCompsitorEffectCustom
+class_name ReframeCompositorEffect
 
 @export_multiline var shader_code: String = "":
 	set(value):
@@ -8,6 +8,7 @@ class_name ReframeCompsitorEffectCustom
 		shader_code = value
 		shader_is_dirty = true
 		mutex.unlock()
+@export var alpha : float = 1;
 
 var rd: RenderingDevice
 var shader: RID
@@ -23,7 +24,7 @@ layout(rgba16f, set = 0, binding = 0) uniform image2D color_image;
 layout(push_constant, std430) uniform Params 
 {
 	vec2 raster_size;
-	vec2 time;
+	vec2 time_alpha;
 } params;
 
 // The code we want to execute in each invocation
@@ -31,8 +32,8 @@ void main()
 {
 	ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
 	ivec2 size = ivec2(params.raster_size);
-    float time = params.time.x;
-    float time_sin = params.time.y;
+    float time = params.time_alpha.x;
+    float alpha = params.time_alpha.y;
 	
 	if (uv.x >= size.x || uv.y >= size.y) 
 	{
@@ -127,7 +128,7 @@ func _render_callback(p_effect_callback_type, p_render_data):
 			push_constant.push_back(size.x)
 			push_constant.push_back(size.y)
 			push_constant.push_back(time)
-			push_constant.push_back(sin(time))
+			push_constant.push_back(alpha)
 
 			# Loop through views just in case we're doing stereo rendering. No extra cost if this is mono.
 			var view_count = render_scene_buffers.get_view_count()
