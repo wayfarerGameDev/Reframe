@@ -2,10 +2,16 @@
 extends CompositorEffect
 class_name ReframeCompositorEffect
 
-@export_multiline var shader_code: String = "":
+@export_multiline var shader_functions_code: String = "":
 	set(value):
 		mutex.lock()
-		shader_code = value
+		shader_functions_code = value
+		shader_is_dirty = true
+		mutex.unlock()
+@export_multiline var shader_main_code: String = "":
+	set(value):
+		mutex.lock()
+		shader_main_code = value
 		shader_is_dirty = true
 		mutex.unlock()
 @export var alpha : float = 1;
@@ -27,9 +33,12 @@ layout(push_constant, std430) uniform Params
 	vec2 time_alpha;
 } params;
 
+#COMPUTE_FUNCTIONS_CODE
+
 // The code we want to execute in each invocation
 void main() 
 {
+	vec2 index = gl_GlobalInvocationID.xy;
 	ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
 	ivec2 size = ivec2(params.raster_size);
     float time = params.time_alpha.x;
@@ -42,7 +51,7 @@ void main()
 
 	vec4 color = imageLoad(color_image, uv);
 
-	#COMPUTE_CODE
+	#COMPUTE_MAIN_CODE
 
 	imageStore(color_image, uv, color);
 }
@@ -61,22 +70,25 @@ func _check_shader() -> bool:
 	if not rd:
 		return false
 
-	var new_shader_code: String = ""
+	var new_main_code: String = ""
+	var new_functions_code: String = ""
 
 	# Check if our shader is dirty.
 	mutex.lock()
 	if shader_is_dirty:
-		new_shader_code = shader_code
+		new_main_code = shader_main_code # Your existing #COMPUTE_CODE content
+		new_functions_code = shader_functions_code # The new content for #COMPUTE_FUNCTIONS_CODE
 		shader_is_dirty = false
 	mutex.unlock()
 
 	# We don't have a (new) shader?
-	if new_shader_code.is_empty():
+	if new_main_code.is_empty() and new_functions_code.is_empty():
 		return pipeline.is_valid()
 
 	# Apply template.
-	new_shader_code = template_shader.replace("#COMPUTE_CODE", new_shader_code);
-
+	var new_shader_code = template_shader.replace("#COMPUTE_MAIN_CODE", new_main_code)
+	new_shader_code = new_shader_code.replace("#COMPUTE_FUNCTIONS_CODE", new_functions_code)
+	
 	# Out with the old.
 	if shader.is_valid():
 		rd.free_rid(shader)

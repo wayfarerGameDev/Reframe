@@ -1,11 +1,16 @@
 @tool
 extends EditorPlugin
 
-var editor_control
+var custom_button: Button
 
 func _enter_tree():
 	ReframeRetroUtilities.global_shader_parameters_defaults()
-	pass
+	ReframeCompositorUtilities.create_editor(self)
 
 func _exit_tree():
+	ReframeCompositorUtilities.destroy_editor(self)
+	pass
+
+func _process(delta: float) -> void:
+	ReframeCompositorUtilities.update_editor(self)
 	pass

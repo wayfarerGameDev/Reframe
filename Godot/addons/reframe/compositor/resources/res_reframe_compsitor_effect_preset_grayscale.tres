@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ReframeCompositorEffectPreset" load_steps=2 format=3 uid="uid://pd3ixeq1n1qg"]
+
+[ext_resource type="Script" uid="uid://b88yvpo0ox613" path="res://addons/reframe/compositor/scripts/src_reframe_compsitor_effect_preset.gd" id="1_w7mdw"]
+
+[resource]
+script = ExtResource("1_w7mdw")
+name = "Grayscale"
+shader_main_code = "// Grayscale
+color.rgb = mix(color.rgb,vec3(dot(color.rgb, vec3(0.2126, 0.7152, 0.0722))),alpha);"
+shader_code = "// Grayscale
+color.rgb = mix(color.rgb,vec3(dot(color.rgb, vec3(0.2126, 0.7152, 0.0722))),alpha);"
+metadata/_custom_type_script = "uid://b88yvpo0ox613"

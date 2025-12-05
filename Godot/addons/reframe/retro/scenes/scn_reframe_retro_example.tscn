@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://bstmic73abm6k"]
+[gd_scene load_steps=18 format=3 uid="uid://bstmic73abm6k"]
 
 [ext_resource type="Shader" uid="uid://x85xdsx2dvb8" path="res://addons/reframe/retro/shaders/shader_reframe_retro_post_process.gdshader" id="2_syaye"]
 [ext_resource type="Script" uid="uid://cte4jalives85" path="res://addons/reframe/camera/fly_camera.gd" id="4_5fu82"]
@@ -24,6 +24,8 @@ background_color = Color(0.32491022, 0.3249102, 0.32491016, 1)
 sky = SubResource("Sky_pjyox")
 tonemap_mode = 2
 glow_enabled = true
+
+[sub_resource type="Compositor" id="Compositor_syaye"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_vrpkw"]
 
@@ -59,6 +61,7 @@ transform = Transform3D(-0.8110088, -0.44709885, -0.37731612, -0.28197315, 0.863
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_fu8rj")
+compositor = SubResource("Compositor_syaye")
 
 [node name="Camera" type="CharacterBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.7691307, 3.650188, -8.918306)
