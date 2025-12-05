@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://jp7wxi1kveij"]
+[gd_scene load_steps=12 format=3 uid="uid://jp7wxi1kveij"]
 
 [ext_resource type="Script" uid="uid://dhcwn5t063wu4" path="res://addons/reframe/compositor/scripts/src_reframe_compsitor_effect.gd" id="1_g8qko"]
 [ext_resource type="Script" uid="uid://cte4jalives85" path="res://addons/reframe/camera/fly_camera.gd" id="2_6r6et"]
@@ -59,69 +59,27 @@ float vignette_factor = smoothstep(radius, radius - softness, dist_sq);
 // Output
 color.rgb = mix(color.rgb, color.rgb * vignette_factor,alpha);"
 
-[sub_resource type="CompositorEffect" id="CompositorEffect_htqpq"]
-resource_local_to_scene = false
-resource_name = ""
-enabled = false
-effect_callback_type = 4
-needs_motion_vectors = false
-needs_normal_roughness = false
-script = ExtResource("1_g8qko")
-shader_functions_code = "float RandValueByIndex(vec2 index)
-{
-    vec3 p3 = fract(vec3(index.x, index.y, index.x) * 0.1031);  // Scramble index into small range for each channel 
-    p3 += dot(p3, p3.yzx + 33.33);                                                                      // Scrables by shuffling yxz to remove repetition
-    return fract((p3.x + p3.y) * p3.z);                                                                // Collapse and ensure range of 0-1
-}
-
-float GaussianDistribution(vec2 index)
-{
-    /*
-    Uses Box-Muller transform to calculate guass/normal distribution from to pair numbers between 0-1
-    mean = 0, std dev = 1
-    */
-    float u1 = max(RandValueByIndex(index), 1e-6);
-    float u2 = RandValueByIndex(index + vec2(17.0, 23.0));    
-    return sqrt(-2.0 * log(u1)) * cos(6.2831853 * u2);
-}"
-shader_main_code = "// Gauss a
-float x =  GaussianDistribution(index + vec2(3,5));
-float y =  GaussianDistribution(index + vec2(1024,1024));
-color = vec4(x,y,0,1);"
-
-[sub_resource type="CompositorEffect" id="CompositorEffect_bcgn6"]
-resource_local_to_scene = false
-resource_name = ""
-enabled = false
-effect_callback_type = 4
-needs_motion_vectors = false
-needs_normal_roughness = false
-script = ExtResource("1_g8qko")
-shader_main_code = "// Pixelate
-const int pixelation_factor = 4;
-color.rgb =   mix(color.rgb,imageLoad(color_image, (uv / pixelation_factor) * pixelation_factor).rgb,alpha);"
-
 [sub_resource type="Compositor" id="Compositor_c6avi"]
-compositor_effects = Array[CompositorEffect]([SubResource("CompositorEffect_g8qko"), SubResource("CompositorEffect_6r6et"), SubResource("CompositorEffect_0c8cu"), SubResource("CompositorEffect_htqpq"), SubResource("CompositorEffect_bcgn6")])
+compositor_effects = Array[CompositorEffect]([SubResource("CompositorEffect_g8qko"), SubResource("CompositorEffect_6r6et"), SubResource("CompositorEffect_0c8cu")])
 
-[node name="Node3D" type="Node3D"]
+[node name="Node3D" type="Node3D" unique_id=373369695]
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1014975647]
 environment = SubResource("Environment_lxjri")
 camera_attributes = SubResource("CameraAttributesPractical_lxjri")
 compositor = SubResource("Compositor_c6avi")
 
-[node name="FlyCamera" type="CharacterBody3D" parent="."]
+[node name="FlyCamera" type="CharacterBody3D" parent="." unique_id=1300076872]
 script = ExtResource("2_6r6et")
 metadata/_custom_type_script = "uid://cte4jalives85"
 
-[node name="ReframeCompsitorEffect_Grayscale" type="Node" parent="."]
+[node name="ReframeCompsitorEffect_Grayscale" type="Node" parent="." unique_id=264373179]
 script = ExtResource("3_0c8cu")
 shader_main_code = "// Grayscale
 color.rgb = mix(color.rgb,vec3(dot(color.rgb, vec3(0.2126, 0.7152, 0.0722))),alpha);"
 metadata/_custom_type_script = "uid://c5sewgecqeh07"
 
-[node name="ReframeCompsitorEffect_RedPulse" type="Node" parent="."]
+[node name="ReframeCompsitorEffect_RedPulse" type="Node" parent="." unique_id=2134086004]
 script = ExtResource("3_0c8cu")
 shader_main_code = "//  Pulse
 float pulse = (sin(time * 2.0) + 1.0) / 2.0;
@@ -129,7 +87,7 @@ color.rgb = mix(color.rgb, color.rgb * pulse * vec3(1,0,0),alpha);"
 alpha = 0.75
 metadata/_custom_type_script = "uid://c5sewgecqeh07"
 
-[node name="ReframeCompsitorEffect_Vignette" type="Node" parent="."]
+[node name="ReframeCompsitorEffect_Vignette" type="Node" parent="." unique_id=387735037]
 script = ExtResource("3_0c8cu")
 shader_main_code = "// Vignette
 float radius = 2;
@@ -142,38 +100,4 @@ float vignette_factor = smoothstep(radius, radius - softness, dist_sq);
 
 // Output
 color.rgb = mix(color.rgb, color.rgb * vignette_factor,alpha);"
-metadata/_custom_type_script = "uid://c5sewgecqeh07"
-
-[node name="ReframeCompsitorEffect_GuassDistribution" type="Node" parent="."]
-script = ExtResource("3_0c8cu")
-shader_function_code = "float RandValueByIndex(vec2 index)
-{
-    vec3 p3 = fract(vec3(index.x, index.y, index.x) * 0.1031);  // Scramble index into small range for each channel 
-    p3 += dot(p3, p3.yzx + 33.33);                                                                      // Scrables by shuffling yxz to remove repetition
-    return fract((p3.x + p3.y) * p3.z);                                                                // Collapse and ensure range of 0-1
-}
-
-float GaussianDistribution(vec2 index)
-{
-    /*
-    Uses Box-Muller transform to calculate guass/normal distribution from to pair numbers between 0-1
-    mean = 0, std dev = 1
-    */
-    float u1 = max(RandValueByIndex(index), 1e-6);
-    float u2 = RandValueByIndex(index + vec2(17.0, 23.0));    
-    return sqrt(-2.0 * log(u1)) * cos(6.2831853 * u2);
-}"
-shader_main_code = "// Gauss a
-float x =  GaussianDistribution(index + vec2(3,5));
-float y =  GaussianDistribution(index + vec2(1024,1024));
-color = vec4(x,y,0,1);"
-enabled = false
-metadata/_custom_type_script = "uid://c5sewgecqeh07"
-
-[node name="ReframeCompsitorEffect_Pixelate" type="Node" parent="."]
-script = ExtResource("3_0c8cu")
-shader_main_code = "// Pixelate
-const int pixelation_factor = 4;
-color.rgb =   mix(color.rgb,imageLoad(color_image, (uv / pixelation_factor) * pixelation_factor).rgb,alpha);"
-enabled = false
 metadata/_custom_type_script = "uid://c5sewgecqeh07"

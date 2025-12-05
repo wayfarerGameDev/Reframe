@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_cgiaf")
-name = "Vignette"
+name = "Guassian Distribution"
 shader_functions_code = "float RandValueByIndex(vec2 index)
 {
     vec3 p3 = fract(vec3(index.x, index.y, index.x) * 0.1031);  // Scramble index into small range for each channel 

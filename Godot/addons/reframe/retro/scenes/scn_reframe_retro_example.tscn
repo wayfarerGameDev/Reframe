@@ -43,9 +43,9 @@ shader_parameter/billboard = false
 shader_parameter/repeat_factor = 0.0
 shader_parameter/albedo_texture = ExtResource("10_4gv7g")
 
-[node name="Scene" type="Node3D"]
+[node name="Scene" type="Node3D" unique_id=360406882]
 
-[node name="ReframeRetroSettings" type="Node3D" parent="." node_paths=PackedStringArray("light_directional_light")]
+[node name="ReframeRetroSettings" type="Node3D" parent="." unique_id=1823916383 node_paths=PackedStringArray("light_directional_light")]
 script = ExtResource("6_vrpkw")
 post_processing_shader = ExtResource("2_syaye")
 resolution = Vector2i(320, 240)
@@ -56,32 +56,32 @@ light_directional_light = NodePath("../DirectionalLight3D")
 light_directional_direction = Vector3(0.37731612, 0.4175012, 0.826635)
 metadata/_custom_type_script = "uid://b4eor8xcneiix"
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=984969227]
 transform = Transform3D(-0.8110088, -0.44709885, -0.37731612, -0.28197315, 0.86381936, -0.4175012, 0.51259714, -0.23220412, -0.826635, 0, 10, 0)
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=915906661]
 environment = SubResource("Environment_fu8rj")
 compositor = SubResource("Compositor_syaye")
 
-[node name="Camera" type="CharacterBody3D" parent="."]
+[node name="Camera" type="CharacterBody3D" parent="." unique_id=946704437]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.7691307, 3.650188, -8.918306)
 script = ExtResource("4_5fu82")
 metadata/_custom_type_script = "uid://cte4jalives85"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Camera"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Camera" unique_id=648804489]
 shape = SubResource("SphereShape3D_vrpkw")
 
-[node name="ReframeRetroParticleSnow" parent="Camera" instance=ExtResource("4_5os5h")]
+[node name="ReframeRetroParticleSnow" parent="Camera" unique_id=1490217167 instance=ExtResource("4_5os5h")]
 
-[node name="Enviorment" type="Node3D" parent="."]
+[node name="Enviorment" type="Node3D" parent="." unique_id=552675717]
 
-[node name="Floor" type="MeshInstance3D" parent="Enviorment"]
+[node name="Floor" type="MeshInstance3D" parent="Enviorment" unique_id=243161940]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5477605, 0, 1.4131459)
 mesh = ExtResource("9_syaye")
 skeleton = NodePath("../..")
 surface_material_override/0 = SubResource("ShaderMaterial_np8cf")
 
-[node name="Crate" type="MeshInstance3D" parent="Enviorment"]
+[node name="Crate" type="MeshInstance3D" parent="Enviorment" unique_id=350417886]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8424234, 1, 0.26822376)
 mesh = ExtResource("9_np8cf")
 surface_material_override/0 = SubResource("ShaderMaterial_syaye")

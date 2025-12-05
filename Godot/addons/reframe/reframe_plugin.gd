@@ -5,12 +5,12 @@ var custom_button: Button
 
 func _enter_tree():
 	ReframeRetroUtilities.global_shader_parameters_defaults()
-	ReframeCompositorUtilities.create_editor(self)
+	ReframeCompositorUtilities.editor_enter(self)
 
 func _exit_tree():
-	ReframeCompositorUtilities.destroy_editor(self)
+	ReframeCompositorUtilities.editor_exit(self)
 	pass
 
 func _process(delta: float) -> void:
-	ReframeCompositorUtilities.update_editor(self)
+	ReframeCompositorUtilities.editor_process(self, delta)
 	pass
