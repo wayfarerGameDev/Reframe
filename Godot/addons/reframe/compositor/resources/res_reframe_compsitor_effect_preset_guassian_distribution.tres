@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_cgiaf")
 name = "Guassian Distribution"
-shader_functions_code = "float RandValueByIndex(vec2 index)
+functions = "float RandValueByIndex(vec2 index)
 {
     vec3 p3 = fract(vec3(index.x, index.y, index.x) * 0.1031);  // Scramble index into small range for each channel 
     p3 += dot(p3, p3.yzx + 33.33);                                                                      // Scrables by shuffling yxz to remove repetition
@@ -22,7 +22,7 @@ float GaussianDistribution(vec2 index)
     float u2 = RandValueByIndex(index + vec2(17.0, 23.0));    
     return sqrt(-2.0 * log(u1)) * cos(6.2831853 * u2);
 }"
-shader_main_code = "// Gauss a
+main = "// Gauss a
 float x =  GaussianDistribution(index + vec2(3,5));
 float y =  GaussianDistribution(index + vec2(1024,1024));
 color = vec4(x,y,0,1);"

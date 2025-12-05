@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="ReframeCompositorEffectPreset" load_steps=2 format=3 uid="uid://ddtqrpm7pu57u"]
+
+[ext_resource type="Script" uid="uid://b88yvpo0ox613" path="res://addons/reframe/compositor/scripts/src_reframe_compsitor_effect_preset.gd" id="1_cgm15"]
+
+[resource]
+script = ExtResource("1_cgm15")
+name = "None"
+metadata/_custom_type_script = "uid://b88yvpo0ox613"

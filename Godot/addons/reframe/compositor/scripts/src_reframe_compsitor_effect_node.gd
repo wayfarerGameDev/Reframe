@@ -2,11 +2,14 @@
 extends Node
 class_name ReframeCompsitorEffectNode
 
-enum TargetCompositorMode { WorldEnviorment }
 
+enum TargetCompositorMode { WorldEnviorment }
+	
 # Parameters
-@export_multiline var shader_function_code : String = ""
-@export_multiline var shader_main_code : String = ""
+@export_group("Shader Code")
+@export_multiline var functions : String = ""
+@export_multiline var main : String = ""
+@export_group("Settings")
 @export var alpha : float = 1
 @export var enabled : bool = true
 @export var target_compositor_mode : TargetCompositorMode = TargetCompositorMode.WorldEnviorment
@@ -51,8 +54,8 @@ func create_effect() -> void:
 	if compositor_effect == null:
 		compositor_effect = ReframeCompositorEffect.new()
 	compositor_effect.enabled = enabled
-	compositor_effect.shader_functions_code = shader_function_code
-	compositor_effect.shader_main_code = shader_main_code
+	compositor_effect.shader_functions_code = functions
+	compositor_effect.shader_main_code = main
 	compositor_effect.alpha = alpha
 	
 	# Compositor (World enviorment)

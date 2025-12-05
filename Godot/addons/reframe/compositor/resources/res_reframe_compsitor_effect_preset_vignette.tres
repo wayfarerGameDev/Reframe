@@ -5,24 +5,11 @@
 [resource]
 script = ExtResource("1_13rnp")
 name = "Vignette"
-shader_functions_code = "float RandValueByIndex(vec2 Index_In)
-{
-    vec3 p3 = fract(vec3(Index_In.x, Index_In.y, Index_In.x) * 0.1031);  // Scramble index into small range for each channel 
-    p3 += dot(p3, p3.yzx + 33.33);                                                                      // Scrables by shuffling yxz to remove repetition
-    return fract((p3.x + p3.y) * p3.z);                                                                // Collapse and ensure range of 0-1
-}
-
-float GaussianDistribution(vec2 Index_In)
-{
-    /*
-    Uses Box-Muller transform to calculate guass/normal distribution from to pair numbers between 0-1
-    mean = 0, std dev = 1
-    */
-    float u1 = max(RandValueByIndex(Index_In), 1e-6);
-    float u2 = RandValueByIndex(Index_In + vec2(17.0, 23.0));    
-    return sqrt(-2.0 * log(u1)) * cos(6.2831853 * u2);
-}"
-shader_main_code = "// Vignette
+main = "// Vignette
 float radius = 2;
-float softness = 3;"
+float softness = 3;
+vec2 normalized_uv = (vec2(uv) / params.raster_size) * 2.0 - 1.0;
+float dist_sq = dot(normalized_uv, normalized_uv);
+float vignette_factor = smoothstep(radius, radius - softness, dist_sq);
+color.rgb = mix(color.rgb, color.rgb * vignette_factor,alpha);"
 metadata/_custom_type_script = "uid://b88yvpo0ox613"

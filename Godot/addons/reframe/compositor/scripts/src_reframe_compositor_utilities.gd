@@ -59,8 +59,8 @@ static func editor_menu_button_preset_selected(id: int) -> void:
 	if Engine.is_editor_hint():
 		var selected_node: ReframeCompsitorEffectNode = EditorInterface.get_selection().get_selected_nodes()[0] as ReframeCompsitorEffectNode
 		var preset = get_presets()[id]
-		selected_node.shader_function_code = preset.shader_functions_code
-		selected_node.shader_main_code = preset.shader_main_code
+		selected_node.functions = preset.functions
+		selected_node.main = preset.main
 		selected_node.alpha = preset.alpha
 		selected_node.name = "ReframeCompsitorEffect_" + preset.name
 		

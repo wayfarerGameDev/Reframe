@@ -23,6 +23,7 @@ effect_callback_type = 4
 needs_motion_vectors = false
 needs_normal_roughness = false
 script = ExtResource("1_g8qko")
+shader_functions_code = "//None"
 shader_main_code = "// Grayscale
 color.rgb = mix(color.rgb,vec3(dot(color.rgb, vec3(0.2126, 0.7152, 0.0722))),alpha);"
 
@@ -34,10 +35,11 @@ effect_callback_type = 4
 needs_motion_vectors = false
 needs_normal_roughness = false
 script = ExtResource("1_g8qko")
+shader_functions_code = "//None"
 shader_main_code = "//  Pulse
 float pulse = (sin(time * 2.0) + 1.0) / 2.0;
 color.rgb = mix(color.rgb, color.rgb * pulse * vec3(1,0,0),alpha);"
-alpha = 0.75
+alpha = 0.66
 
 [sub_resource type="CompositorEffect" id="CompositorEffect_0c8cu"]
 resource_local_to_scene = false
@@ -47,16 +49,13 @@ effect_callback_type = 4
 needs_motion_vectors = false
 needs_normal_roughness = false
 script = ExtResource("1_g8qko")
+shader_functions_code = "//None"
 shader_main_code = "// Vignette
 float radius = 2;
 float softness = 3;
-
-// Effect
 vec2 normalized_uv = (vec2(uv) / params.raster_size) * 2.0 - 1.0;
 float dist_sq = dot(normalized_uv, normalized_uv);
 float vignette_factor = smoothstep(radius, radius - softness, dist_sq);
-
-// Output
 color.rgb = mix(color.rgb, color.rgb * vignette_factor,alpha);"
 
 [sub_resource type="Compositor" id="Compositor_c6avi"]
@@ -75,29 +74,25 @@ metadata/_custom_type_script = "uid://cte4jalives85"
 
 [node name="ReframeCompsitorEffect_Grayscale" type="Node" parent="." unique_id=264373179]
 script = ExtResource("3_0c8cu")
-shader_main_code = "// Grayscale
+main = "// Grayscale
 color.rgb = mix(color.rgb,vec3(dot(color.rgb, vec3(0.2126, 0.7152, 0.0722))),alpha);"
 metadata/_custom_type_script = "uid://c5sewgecqeh07"
 
-[node name="ReframeCompsitorEffect_RedPulse" type="Node" parent="." unique_id=2134086004]
+[node name="ReframeCompsitorEffect_Pulse" type="Node" parent="." unique_id=2134086004]
 script = ExtResource("3_0c8cu")
-shader_main_code = "//  Pulse
+main = "//  Pulse
 float pulse = (sin(time * 2.0) + 1.0) / 2.0;
 color.rgb = mix(color.rgb, color.rgb * pulse * vec3(1,0,0),alpha);"
-alpha = 0.75
+alpha = 0.66
 metadata/_custom_type_script = "uid://c5sewgecqeh07"
 
 [node name="ReframeCompsitorEffect_Vignette" type="Node" parent="." unique_id=387735037]
 script = ExtResource("3_0c8cu")
-shader_main_code = "// Vignette
+main = "// Vignette
 float radius = 2;
 float softness = 3;
-
-// Effect
 vec2 normalized_uv = (vec2(uv) / params.raster_size) * 2.0 - 1.0;
 float dist_sq = dot(normalized_uv, normalized_uv);
 float vignette_factor = smoothstep(radius, radius - softness, dist_sq);
-
-// Output
 color.rgb = mix(color.rgb, color.rgb * vignette_factor,alpha);"
 metadata/_custom_type_script = "uid://c5sewgecqeh07"

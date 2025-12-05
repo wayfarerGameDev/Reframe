@@ -4,12 +4,14 @@ class_name ReframeCompositorEffect
 
 @export_multiline var shader_functions_code: String = "":
 	set(value):
+		if value == "": value = "//None" # Needed to recompile shaders for empty code
 		mutex.lock()
 		shader_functions_code = value
 		shader_is_dirty = true
 		mutex.unlock()
 @export_multiline var shader_main_code: String = "":
 	set(value):
+		if value == "": value = "//None" # Needed to recompile shaders for empty code
 		mutex.lock()
 		shader_main_code = value
 		shader_is_dirty = true
