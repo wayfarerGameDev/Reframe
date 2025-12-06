@@ -15,7 +15,7 @@ sky = SubResource("Sky_pwjum")
 
 [sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_lxjri"]
 
-[sub_resource type="CompositorEffect" id="CompositorEffect_g8qko"]
+[sub_resource type="CompositorEffect" id="CompositorEffect_0c8cu"]
 resource_local_to_scene = false
 resource_name = ""
 enabled = true
@@ -26,8 +26,9 @@ script = ExtResource("1_g8qko")
 shader_functions_code = "//None"
 shader_main_code = "// Grayscale
 color.rgb = mix(color.rgb,vec3(dot(color.rgb, vec3(0.2126, 0.7152, 0.0722))),alpha);"
+alpha = 0.0
 
-[sub_resource type="CompositorEffect" id="CompositorEffect_6r6et"]
+[sub_resource type="CompositorEffect" id="CompositorEffect_g8qko"]
 resource_local_to_scene = false
 resource_name = ""
 enabled = true
@@ -39,9 +40,9 @@ shader_functions_code = "//None"
 shader_main_code = "//  Pulse
 float pulse = (sin(time * 2.0) + 1.0) / 2.0;
 color.rgb = mix(color.rgb, color.rgb * pulse * vec3(1,0,0),alpha);"
-alpha = 0.66
+alpha = 0.5
 
-[sub_resource type="CompositorEffect" id="CompositorEffect_0c8cu"]
+[sub_resource type="CompositorEffect" id="CompositorEffect_bcgn6"]
 resource_local_to_scene = false
 resource_name = ""
 enabled = true
@@ -59,7 +60,7 @@ float vignette_factor = smoothstep(radius, radius - softness, dist_sq);
 color.rgb = mix(color.rgb, color.rgb * vignette_factor,alpha);"
 
 [sub_resource type="Compositor" id="Compositor_c6avi"]
-compositor_effects = Array[CompositorEffect]([SubResource("CompositorEffect_g8qko"), SubResource("CompositorEffect_6r6et"), SubResource("CompositorEffect_0c8cu")])
+compositor_effects = Array[CompositorEffect]([SubResource("CompositorEffect_0c8cu"), SubResource("CompositorEffect_g8qko"), SubResource("CompositorEffect_bcgn6")])
 
 [node name="Node3D" type="Node3D" unique_id=373369695]
 
@@ -72,18 +73,19 @@ compositor = SubResource("Compositor_c6avi")
 script = ExtResource("2_6r6et")
 metadata/_custom_type_script = "uid://cte4jalives85"
 
-[node name="ReframeCompsitorEffect_Grayscale" type="Node" parent="." unique_id=264373179]
+[node name="ReframeCompsitorEffect_Grayscale" type="Node" parent="." unique_id=1897759080]
 script = ExtResource("3_0c8cu")
 main = "// Grayscale
 color.rgb = mix(color.rgb,vec3(dot(color.rgb, vec3(0.2126, 0.7152, 0.0722))),alpha);"
+alpha = 0.0
 metadata/_custom_type_script = "uid://c5sewgecqeh07"
 
-[node name="ReframeCompsitorEffect_Pulse" type="Node" parent="." unique_id=2134086004]
+[node name="ReframeCompsitorEffect_Pulse" type="Node" parent="." unique_id=730926489]
 script = ExtResource("3_0c8cu")
 main = "//  Pulse
 float pulse = (sin(time * 2.0) + 1.0) / 2.0;
 color.rgb = mix(color.rgb, color.rgb * pulse * vec3(1,0,0),alpha);"
-alpha = 0.66
+alpha = 0.5
 metadata/_custom_type_script = "uid://c5sewgecqeh07"
 
 [node name="ReframeCompsitorEffect_Vignette" type="Node" parent="." unique_id=387735037]

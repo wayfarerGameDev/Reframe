@@ -52,17 +52,26 @@ static func editor_menu_button_populate_by_presets(menu_button: MenuButton) -> v
 		# Populate
 		menu_button.get_popup().clear()
 		var presets = get_presets()
+		menu_button.get_popup().add_item("None", 0)
 		for i in presets.size():
-			menu_button.get_popup().add_item(presets[i].name, i)
+			menu_button.get_popup().add_item(presets[i].name, i + 1)
 	
 static func editor_menu_button_preset_selected(id: int) -> void:
 	if Engine.is_editor_hint():
 		var selected_node: ReframeCompsitorEffectNode = EditorInterface.get_selection().get_selected_nodes()[0] as ReframeCompsitorEffectNode
-		var preset = get_presets()[id]
-		selected_node.functions = preset.functions
-		selected_node.main = preset.main
-		selected_node.alpha = preset.alpha
-		selected_node.name = "ReframeCompsitorEffect_" + preset.name
+		var preset = get_presets()[id - 1] # To offset None option
+		#None
+		if id == 0:
+			selected_node.functions = ""
+			selected_node.main = ""
+			selected_node.alpha = 1
+			selected_node.name = "ReframeCompsitorEffect_None"
+		#Preset
+		else:
+			selected_node.functions = preset.functions
+			selected_node.main = preset.main
+			selected_node.alpha = preset.alpha
+			selected_node.name = "ReframeCompsitorEffect_" + preset.name
 		
 static func get_presets() -> Array[ReframeCompositorEffectPreset]:
 	var presets: Array[ReframeCompositorEffectPreset] = []

@@ -40,22 +40,22 @@ layout(push_constant, std430) uniform Params
 // The code we want to execute in each invocation
 void main() 
 {
-	vec2 index = gl_GlobalInvocationID.xy;
-	ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+	vec2 uv = gl_GlobalInvocationID.xy;
+	ivec2 index = ivec2(gl_GlobalInvocationID.xy);
 	ivec2 size = ivec2(params.raster_size);
     float time = params.time_alpha.x;
     float alpha = params.time_alpha.y;
 	
-	if (uv.x >= size.x || uv.y >= size.y) 
+	if (index.x >= size.x || index.y >= size.y) 
 	{
 		return;
 	}
 
-	vec4 color = imageLoad(image, uv);
+	vec4 color = imageLoad(image, index);
 
 	#COMPUTE_MAIN_CODE
 
-	imageStore(image, uv, color);
+	imageStore(image, index, color);
 }
 """
 

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ReframeCompositorEffectPreset" load_steps=2 format=3 uid="uid://2k6lxdlxh7c4"]
+
+[ext_resource type="Script" uid="uid://b88yvpo0ox613" path="res://addons/reframe/compositor/scripts/src_reframe_compsitor_effect_preset.gd" id="1_8oebg"]
+
+[resource]
+script = ExtResource("1_8oebg")
+name = "ColorQuanzation"
+main = "// Color Quanziation
+float quanziation_depth = 31;
+color = round(color * quanziation_depth) / quanziation_depth;"
+metadata/_custom_type_script = "uid://b88yvpo0ox613"
