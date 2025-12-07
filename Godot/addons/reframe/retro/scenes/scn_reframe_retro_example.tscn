@@ -1,12 +1,12 @@
 [gd_scene load_steps=18 format=3 uid="uid://bstmic73abm6k"]
 
 [ext_resource type="Shader" uid="uid://x85xdsx2dvb8" path="res://addons/reframe/retro/shaders/shader_reframe_retro_post_process.gdshader" id="2_syaye"]
+[ext_resource type="Texture2D" uid="uid://b0dtf4o7nigyb" path="res://addons/reframe/retro/textures/tex_reframe_retro_dither_matrix_blue_noise_4x4.png" id="3_syaye"]
 [ext_resource type="Script" uid="uid://cte4jalives85" path="res://addons/reframe/camera/fly_camera.gd" id="4_5fu82"]
 [ext_resource type="PackedScene" uid="uid://bpfmunsh25v5l" path="res://addons/reframe/retro/particles/prt_reframe_retro_snow.tscn" id="4_5os5h"]
 [ext_resource type="Shader" uid="uid://612q4qpqb7gh" path="res://addons/reframe/retro/shaders/shader_reframe_retro_object.gdshader" id="6_m6hqo"]
 [ext_resource type="Script" uid="uid://b4eor8xcneiix" path="res://addons/reframe/retro/scripts/src_reframe_retro_settings.gd" id="6_vrpkw"]
 [ext_resource type="Texture2D" uid="uid://dbxx8jop17pc1" path="res://addons/reframe/retro/textures/tex_reframe_retro_floor_concrete.PNG" id="8_avdpg"]
-[ext_resource type="Texture2D" uid="uid://cmqjyf7hdfo84" path="res://addons/reframe/retro/textures/tex_reframe_retro_dither_matrix_ps1_4x4.png" id="8_syaye"]
 [ext_resource type="ArrayMesh" uid="uid://cl80o1ow8rxrj" path="res://addons/reframe/retro/meshes/crate.obj" id="9_np8cf"]
 [ext_resource type="ArrayMesh" uid="uid://b7150efvdpykr" path="res://addons/reframe/retro/meshes/floor.obj" id="9_syaye"]
 [ext_resource type="Texture2D" uid="uid://bkaksukvbnvnv" path="res://addons/reframe/retro/textures/tex_reframe_retro_crate.png" id="10_4gv7g"]
@@ -49,11 +49,13 @@ shader_parameter/albedo_texture = ExtResource("10_4gv7g")
 script = ExtResource("6_vrpkw")
 post_processing_shader = ExtResource("2_syaye")
 resolution = Vector2i(320, 240)
-dithering_matrix_texture = ExtResource("8_syaye")
+dithering_matrix_texture = ExtResource("3_syaye")
 vertex_jitter_strength = 20.0
 fog_mode = 0
+fog_depth_precision = 128.0
 light_directional_light = NodePath("../DirectionalLight3D")
 light_directional_direction = Vector3(0.37731612, 0.4175012, 0.826635)
+light_directional_color = Color(0.51809675, 6.497651e-07, 4.813075e-08, 1)
 metadata/_custom_type_script = "uid://b4eor8xcneiix"
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=984969227]

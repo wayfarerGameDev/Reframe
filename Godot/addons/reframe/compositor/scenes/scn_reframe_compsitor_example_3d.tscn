@@ -1,66 +1,32 @@
-[gd_scene load_steps=12 format=3 uid="uid://jp7wxi1kveij"]
+[gd_scene load_steps=11 format=3 uid="uid://jp7wxi1kveij"]
 
-[ext_resource type="Script" uid="uid://dhcwn5t063wu4" path="res://addons/reframe/compositor/scripts/src_reframe_compsitor_effect.gd" id="1_g8qko"]
+[ext_resource type="Script" uid="uid://dhcwn5t063wu4" path="res://addons/reframe/compositor/scripts/src_reframe_compsitor_effect.gd" id="1_6r6et"]
 [ext_resource type="Script" uid="uid://cte4jalives85" path="res://addons/reframe/camera/fly_camera.gd" id="2_6r6et"]
-[ext_resource type="Script" uid="uid://c5sewgecqeh07" path="res://addons/reframe/compositor/scripts/src_reframe_compsitor_effect_node.gd" id="3_0c8cu"]
+[ext_resource type="Script" uid="uid://c5sewgecqeh07" path="res://addons/reframe/compositor/scripts/src_reframe_compsitor_effect_node.gd" id="4_0c8cu"]
+[ext_resource type="Script" uid="uid://c6ggx4rbflab5" path="res://addons/reframe/compositor/scripts/new_script.gd" id="4_6r6et"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_lxjri"]
 
-[sub_resource type="Sky" id="Sky_pwjum"]
+[sub_resource type="Sky" id="Sky_6r6et"]
 sky_material = SubResource("ProceduralSkyMaterial_lxjri")
 
 [sub_resource type="Environment" id="Environment_lxjri"]
 background_mode = 2
-sky = SubResource("Sky_pwjum")
+sky = SubResource("Sky_6r6et")
 
 [sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_lxjri"]
 
-[sub_resource type="CompositorEffect" id="CompositorEffect_0c8cu"]
+[sub_resource type="CompositorEffect" id="CompositorEffect_6r6et"]
 resource_local_to_scene = false
 resource_name = ""
 enabled = true
 effect_callback_type = 4
 needs_motion_vectors = false
 needs_normal_roughness = false
-script = ExtResource("1_g8qko")
-shader_functions_code = "//None"
-shader_main_code = "// Grayscale
-color.rgb = mix(color.rgb,vec3(dot(color.rgb, vec3(0.2126, 0.7152, 0.0722))),alpha);"
-alpha = 0.0
-
-[sub_resource type="CompositorEffect" id="CompositorEffect_g8qko"]
-resource_local_to_scene = false
-resource_name = ""
-enabled = true
-effect_callback_type = 4
-needs_motion_vectors = false
-needs_normal_roughness = false
-script = ExtResource("1_g8qko")
-shader_functions_code = "//None"
-shader_main_code = "//  Pulse
-float pulse = (sin(time * 2.0) + 1.0) / 2.0;
-color.rgb = mix(color.rgb, color.rgb * pulse * vec3(1,0,0),alpha);"
-alpha = 0.5
-
-[sub_resource type="CompositorEffect" id="CompositorEffect_bcgn6"]
-resource_local_to_scene = false
-resource_name = ""
-enabled = true
-effect_callback_type = 4
-needs_motion_vectors = false
-needs_normal_roughness = false
-script = ExtResource("1_g8qko")
-shader_functions_code = "//None"
-shader_main_code = "// Vignette
-float radius = 2;
-float softness = 3;
-vec2 normalized_uv = (vec2(uv) / params.raster_size) * 2.0 - 1.0;
-float dist_sq = dot(normalized_uv, normalized_uv);
-float vignette_factor = smoothstep(radius, radius - softness, dist_sq);
-color.rgb = mix(color.rgb, color.rgb * vignette_factor,alpha);"
+script = ExtResource("1_6r6et")
 
 [sub_resource type="Compositor" id="Compositor_c6avi"]
-compositor_effects = Array[CompositorEffect]([SubResource("CompositorEffect_0c8cu"), SubResource("CompositorEffect_g8qko"), SubResource("CompositorEffect_bcgn6")])
+compositor_effects = Array[CompositorEffect]([SubResource("CompositorEffect_6r6et")])
 
 [node name="Node3D" type="Node3D" unique_id=373369695]
 
@@ -73,28 +39,36 @@ compositor = SubResource("Compositor_c6avi")
 script = ExtResource("2_6r6et")
 metadata/_custom_type_script = "uid://cte4jalives85"
 
-[node name="ReframeCompsitorEffect_Grayscale" type="Node" parent="." unique_id=1897759080]
-script = ExtResource("3_0c8cu")
-main = "// Grayscale
-color.rgb = mix(color.rgb,vec3(dot(color.rgb, vec3(0.2126, 0.7152, 0.0722))),alpha);"
-alpha = 0.0
+[node name="ReframeCompsitorEffect_GuassianDistribution" type="Node" parent="." unique_id=2070722336]
+script = ExtResource("4_0c8cu")
+uniforms = ["preview"]
+world_resolution = Vector2i(512, 512)
+functions = "float RandValueByIndex(vec2 index)
+{
+    vec3 p3 = fract(vec3(index.x, index.y, index.x) * 0.1031);  // Scramble index into small range for each channel 
+    p3 += dot(p3, p3.yzx + 33.33);                                                                      // Scrables by shuffling yxz to remove repetition
+    return fract((p3.x + p3.y) * p3.z);                                                                // Collapse and ensure range of 0-1
+}
+
+float GaussianDistribution(vec2 index)
+{
+    /*
+    Uses Box-Muller transform to calculate guass/normal distribution from to pair numbers between 0-1
+    mean = 0, std dev = 1
+    */
+    float u1 = max(RandValueByIndex(index), 1e-6);
+    float u2 = RandValueByIndex(index + vec2(17.0, 23.0));    
+    return sqrt(-2.0 * log(u1)) * cos(6.2831853 * u2);
+}"
+main = "// Gauss a
+float x =  GaussianDistribution(index + vec2(3,5));
+float y =  GaussianDistribution(index + vec2(1024,1024));
+color = vec4(x,y,0,1);"
+domain = 1
 metadata/_custom_type_script = "uid://c5sewgecqeh07"
 
-[node name="ReframeCompsitorEffect_Pulse" type="Node" parent="." unique_id=730926489]
-script = ExtResource("3_0c8cu")
-main = "//  Pulse
-float pulse = (sin(time * 2.0) + 1.0) / 2.0;
-color.rgb = mix(color.rgb, color.rgb * pulse * vec3(1,0,0),alpha);"
-alpha = 0.5
-metadata/_custom_type_script = "uid://c5sewgecqeh07"
-
-[node name="ReframeCompsitorEffect_Vignette" type="Node" parent="." unique_id=387735037]
-script = ExtResource("3_0c8cu")
-main = "// Vignette
-float radius = 2;
-float softness = 3;
-vec2 normalized_uv = (vec2(uv) / params.raster_size) * 2.0 - 1.0;
-float dist_sq = dot(normalized_uv, normalized_uv);
-float vignette_factor = smoothstep(radius, radius - softness, dist_sq);
-color.rgb = mix(color.rgb, color.rgb * vignette_factor,alpha);"
-metadata/_custom_type_script = "uid://c5sewgecqeh07"
+[node name="ReframeCompositorSubViewport" type="SubViewportContainer" parent="." unique_id=2136562117]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("4_6r6et")
+metadata/_custom_type_script = "uid://c6ggx4rbflab5"

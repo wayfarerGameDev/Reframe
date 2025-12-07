@@ -3,16 +3,22 @@ extends Node
 class_name ReframeCompsitorEffectNode
 
 
-enum TargetCompositorMode { WorldEnviorment }
+enum TargetCompositorMode { WORLD_ENVIORMENT }
 	
 # Parameters
-@export_group("Shader Code")
+@export_group("Uniforms")
+@export var uniforms : Array
+@export_group("World")
+@export var world_resolution : Vector2i = Vector2i(256,256)
+@export var world_alpha: float = 1
+@export_group("Code")
 @export_multiline var functions : String = ""
 @export_multiline var main : String = ""
 @export_group("Settings")
-@export var alpha : float = 1
-@export var enabled : bool = true
-@export var target_compositor_mode : TargetCompositorMode = TargetCompositorMode.WorldEnviorment
+@export var domain: ReframeCompositorComputeShader.Domain
+@export var target_compositor_mode : TargetCompositorMode = TargetCompositorMode.WORLD_ENVIORMENT
+
+var refram_compute_shader : ReframeCompositorComputeShader
 var compositor_effect : ReframeCompositorEffect
 var compositor : Compositor
 
@@ -29,6 +35,7 @@ func find_first_world_enviorment(root: Node = get_tree().root) -> WorldEnvironme
 func _notification(what):
 	# Exit
 	if what == NOTIFICATION_PREDELETE or what == NOTIFICATION_EXIT_TREE:
+		refram_compute_shader._notification(what)
 		remove_from_compositor()
 		return
 	# Enter
@@ -45,21 +52,39 @@ func _ready() -> void:
 	# Editor (continuous updates)
 	if Engine.is_editor_hint():
 		set_process_internal(true)
+			
+func _get_configuration_warnings() -> PackedStringArray:
+	if Engine.is_editor_hint() :
+		if not compositor_effect.refram_compute_shader.shader.is_valid():
+			return ["Invalid shader"]
+	return []
+		
 
 func _process(delta: float) -> void:
+	# Editor warning
+	if Engine.is_editor_hint():
+		update_configuration_warnings()
+	# Add
 	add_to_compositor()
+	
 
 func create_effect() -> void:
+	# Compute shader
+	if refram_compute_shader == null:
+		refram_compute_shader = ReframeCompositorComputeShader.new()
+		refram_compute_shader.init()
+	refram_compute_shader.uniforms = uniforms
+	refram_compute_shader.world_alpha = world_alpha
+	refram_compute_shader.world_resolution = world_resolution
+	refram_compute_shader.shader_functions_code = functions
+	refram_compute_shader.shader_main_code = main
+	refram_compute_shader.domain = domain
 	# Compositor effect
 	if compositor_effect == null:
 		compositor_effect = ReframeCompositorEffect.new()
-	compositor_effect.enabled = enabled
-	compositor_effect.shader_functions_code = functions
-	compositor_effect.shader_main_code = main
-	compositor_effect.alpha = alpha
-	
+		compositor_effect.refram_compute_shader = refram_compute_shader
 	# Compositor (World enviorment)
-	if target_compositor_mode == TargetCompositorMode.WorldEnviorment:
+	if target_compositor_mode == TargetCompositorMode.WORLD_ENVIORMENT:
 		var world_enviorment = find_first_world_enviorment()
 		if world_enviorment:
 			compositor = world_enviorment.compositor

@@ -1,9 +1,15 @@
 class_name ReframeCompositorEffectPreset extends Resource
 
 # Properties
-@export var name: String = "New Preset" 
-@export_group("Shader Code")
-@export_multiline var functions: String = ""
-@export_multiline var main: String = ""
-@export_group("Defaults")
-@export var alpha: float = 1.0
+@export var name : StringName 
+@export_group("Uniforms")
+@export var uniforms : Array
+@export_group("World")
+@export var world_resolution : Vector2i = Vector2i(256,256)
+@export var world_alpha: float = 1
+@export_group("Code")
+@export_multiline var functions : String = ""
+@export_multiline var main : String = ""
+@export_group("Settings")
+@export var domain: ReframeCompositorComputeShader.Domain
+@export var target_compositor_mode : ReframeCompsitorEffectNode.TargetCompositorMode

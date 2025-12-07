@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_8oebg")
-name = "ColorQuanzation"
+name = &"ColorQuantization"
 main = "// Color Quanziation
 float quanziation_depth = 31;
 color = round(color * quanziation_depth) / quanziation_depth;"

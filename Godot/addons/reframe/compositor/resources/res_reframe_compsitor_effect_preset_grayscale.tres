@@ -6,5 +6,5 @@
 script = ExtResource("1_w7mdw")
 name = "Grayscale"
 main = "// Grayscale
-color.rgb = mix(color.rgb,vec3(dot(color.rgb, vec3(0.2126, 0.7152, 0.0722))),alpha);"
+color.rgb = mix(color.rgb,vec3(dot(color.rgb, vec3(0.2126, 0.7152, 0.0722))),world_alpha_in);"
 metadata/_custom_type_script = "uid://b88yvpo0ox613"

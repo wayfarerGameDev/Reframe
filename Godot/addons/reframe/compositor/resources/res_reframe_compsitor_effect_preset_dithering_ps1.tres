@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_2wwrh")
-name = "DitheringPS1"
+name = &"Dithering"
 main = "//  Dithering
 // Based on ps1
 const float dithering_strength = 1.0;

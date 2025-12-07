@@ -5,47 +5,94 @@ class_name ReframeCompositorUtilities
 const PRESETS_DIRECTORY: String = "res://addons/reframe/compositor/resources/"
 
 # Editor
-static var button_spatial : MenuButton
-static var button_canvas : MenuButton
+static var editor_button_spatial : MenuButton
+static var editor_button_canvas : MenuButton
 
+# Runtime
+static var rid_texture_map : Dictionary = {}
+
+static func create_texture_rid(name: String, resolution : Vector2i) -> RID:
+	# Rendering device
+	var rendering_device = RenderingServer.get_rendering_device()
+	# Texture (Fetch)
+	# Remove if format changed so new texture can be created
+	var texture_rid : RID
+	if rid_texture_map.has(name):
+		texture_rid = rid_texture_map[name]
+		var existing_format = rendering_device.texture_get_format(texture_rid)
+		if existing_format.width == resolution.x and existing_format.height == resolution.y:
+			return texture_rid
+		else:
+			rendering_device.free_rid(texture_rid)
+			rid_texture_map.erase(name)
+	# Texture Format
+	var texture_format = RDTextureFormat.new()
+	texture_format.width = resolution.x
+	texture_format.height = resolution.y
+	texture_format.format = RenderingDevice.DATA_FORMAT_R32G32B32A32_SFLOAT
+	texture_format.usage_bits = RenderingDevice.TEXTURE_USAGE_CAN_UPDATE_BIT | RenderingDevice.TEXTURE_USAGE_STORAGE_BIT | RenderingDevice.TEXTURE_USAGE_CAN_COPY_FROM_BIT
+	# Image
+	var image = Image.create(resolution.x,resolution.y, false, Image.FORMAT_RGBAF)	
+	image.fill(Color.DEEP_PINK)
+	# Texture (New)
+	texture_rid = rendering_device.texture_create(texture_format,RDTextureView.new(),[image.get_data()]);
+	rid_texture_map[name] = texture_rid
+	return texture_rid
+
+static func fetch_texture_rid(name: String) -> RID:
+	if rid_texture_map.has(name):
+		return rid_texture_map[name]
+	else: return RID()
+		
+static func write_texture_rid_to_image(texture_rid : RID, image : Image) -> void:
+	# Rendering device
+	var rendering_device = RenderingServer.get_rendering_device()
+	# Image
+	var texture_data : PackedByteArray = rendering_device.texture_get_data(texture_rid, 0);
+	var texture_format = rendering_device.texture_get_format(texture_rid)
+	image.set_data(texture_format.width,texture_format.height,false, Image.FORMAT_RGBAF,texture_data);
+			
 static func editor_enter(editor_plugin : EditorPlugin) -> void:
 	if Engine.is_editor_hint():
+		# Image preview
+		# Moved to process so we can use gpu
 		# Presets button (Spatial)
-		button_spatial = MenuButton.new()
-		button_spatial.text = "Presets"
-		button_spatial.flat = true
-		button_spatial.pressed.connect(editor_menu_button_populate_by_presets.bind(button_spatial))
-		button_spatial.get_popup().id_pressed.connect(editor_menu_button_preset_selected)
+		editor_button_spatial = MenuButton.new()
+		editor_button_spatial.text = "Presets"
+		editor_button_spatial.flat = true
+		editor_button_spatial.pressed.connect(editor_menu_button_populate_by_presets.bind(editor_button_spatial))
+		editor_button_spatial.get_popup().id_pressed.connect(editor_menu_button_preset_selected)
 		# Presets button (Canvas)
-		button_canvas = MenuButton.new()
-		button_canvas.text = "Presets"
-		button_canvas.flat = true
-		button_canvas.pressed.connect(editor_menu_button_populate_by_presets.bind(button_canvas))
-		button_canvas.get_popup().id_pressed.connect(editor_menu_button_preset_selected)
+		editor_button_canvas = MenuButton.new()
+		editor_button_canvas.text = "Presets"
+		editor_button_canvas.flat = true
+		editor_button_canvas.pressed.connect(editor_menu_button_populate_by_presets.bind(editor_button_canvas))
+		editor_button_canvas.get_popup().id_pressed.connect(editor_menu_button_preset_selected)
 
 static func editor_exit(editor_plugin : EditorPlugin) -> void:
 	if Engine.is_editor_hint():
 		# Presets button (Spatial)
-		editor_plugin.remove_control_from_container(editor_plugin.CONTAINER_SPATIAL_EDITOR_MENU, button_spatial)
-		button_spatial.queue_free()
-		button_spatial = null
+		editor_plugin.remove_control_from_container(editor_plugin.CONTAINER_SPATIAL_EDITOR_MENU, editor_button_spatial)
+		editor_button_spatial.queue_free()
+		editor_button_spatial = null
 		# Presets button (Canvas)
-		editor_plugin.remove_control_from_container(editor_plugin.CONTAINER_CANVAS_EDITOR_MENU, button_canvas)
-		button_canvas.queue_free()
-		button_spatial = null
-		button_canvas = null
+		editor_plugin.remove_control_from_container(editor_plugin.CONTAINER_CANVAS_EDITOR_MENU, editor_button_canvas)
+		editor_button_canvas.queue_free()
+		editor_button_spatial = null
+		editor_button_canvas = null
 		
 static func editor_process(editor_plugin : EditorPlugin, delta: float) -> void:
 	if Engine.is_editor_hint():
+		# Selected nodes
 		var selected_nodes: Array = EditorInterface.get_selection().get_selected_nodes()
-		# Visible
-		if selected_nodes.size() > 0 and selected_nodes[0] is ReframeCompsitorEffectNode and button_spatial.get_parent_control() == null:
-			editor_plugin.add_control_to_container(editor_plugin.CONTAINER_SPATIAL_EDITOR_MENU, button_spatial)
-			editor_plugin.add_control_to_container(editor_plugin.CONTAINER_CANVAS_EDITOR_MENU, button_canvas)		
-		# Hidden
-		else : if (selected_nodes.size() == 0 or selected_nodes[0] is not ReframeCompsitorEffectNode) and button_spatial.get_parent_control() != null:
-				editor_plugin.remove_control_from_container(editor_plugin.CONTAINER_SPATIAL_EDITOR_MENU, button_spatial)
-				editor_plugin.remove_control_from_container(editor_plugin.CONTAINER_CANVAS_EDITOR_MENU, button_canvas)
+		# Presets (Visible)
+		if selected_nodes.size() > 0 and selected_nodes[0] is ReframeCompsitorEffectNode and editor_button_spatial.get_parent_control() == null:
+			editor_plugin.add_control_to_container(editor_plugin.CONTAINER_SPATIAL_EDITOR_MENU, editor_button_spatial)
+			editor_plugin.add_control_to_container(editor_plugin.CONTAINER_CANVAS_EDITOR_MENU, editor_button_canvas)		
+		# Presets (Hidden)
+		else : if (selected_nodes.size() == 0 or selected_nodes[0] is not ReframeCompsitorEffectNode) and editor_button_spatial.get_parent_control() != null:
+				editor_plugin.remove_control_from_container(editor_plugin.CONTAINER_SPATIAL_EDITOR_MENU, editor_button_spatial)
+				editor_plugin.remove_control_from_container(editor_plugin.CONTAINER_CANVAS_EDITOR_MENU, editor_button_canvas)
 	
 static func editor_menu_button_populate_by_presets(menu_button: MenuButton) -> void:
 	if Engine.is_editor_hint():
@@ -62,17 +109,24 @@ static func editor_menu_button_preset_selected(id: int) -> void:
 		var preset = get_presets()[id - 1] # To offset None option
 		#None
 		if id == 0:
+			selected_node.name = "ReframeCompsitorEffect_None"
+			selected_node.uniforms = []
+			selected_node.world_alpha = 1
+			selected_node.world_resolution = Vector2i(256,256)
 			selected_node.functions = ""
 			selected_node.main = ""
-			selected_node.alpha = 1
-			selected_node.name = "ReframeCompsitorEffect_None"
+			selected_node.domain = ReframeCompositorComputeShader.Domain.COMPOSITOR
+			selected_node.target_compositor_mode = ReframeCompsitorEffectNode.TargetCompositorMode.WORLD_ENVIORMENT
 		#Preset
 		else:
+			selected_node.name = "ReframeCompsitorEffect_" + preset.name
+			selected_node.uniforms = preset.uniforms
+			selected_node.world_alpha = preset.world_alpha
+			selected_node.world_resolution = preset.world_resolution
 			selected_node.functions = preset.functions
 			selected_node.main = preset.main
-			selected_node.alpha = preset.alpha
-			selected_node.name = "ReframeCompsitorEffect_" + preset.name
-		
+			selected_node.domain = preset.domain
+			selected_node.target_compositor_mode = preset.target_compositor_mode
 static func get_presets() -> Array[ReframeCompositorEffectPreset]:
 	var presets: Array[ReframeCompositorEffectPreset] = []
 	
