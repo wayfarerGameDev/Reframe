@@ -3,15 +3,23 @@ class_name ReframeCompositorUtilities
 
 # Consts
 const PRESETS_DIRECTORY: String = "res://addons/reframe/compositor/resources/"
+const RESOLUTION_TEXTURE_MIN: Vector2i = Vector2i(32,32)
+const RESOLUTION_TEXTURE_MAX: Vector2i = Vector2i(1024,1024)
 
 # Editor
 static var editor_button_spatial : MenuButton
 static var editor_button_canvas : MenuButton
+static var editor_preview_texture_rect : TextureRect
+static var editor_preview_image : Image
+static var editor_preview_control
 
 # Runtime
 static var rid_texture_map : Dictionary = {}
 
-static func create_texture_rid(name: String, resolution : Vector2i) -> RID:
+static func create_texture_rid(name: StringName, resolution : Vector2i) -> RID:
+	# Clamp resolution
+	resolution.x = clamp(resolution.x, RESOLUTION_TEXTURE_MIN.x, RESOLUTION_TEXTURE_MAX.x)
+	resolution.y = clamp(resolution.y, RESOLUTION_TEXTURE_MIN.y, RESOLUTION_TEXTURE_MAX.y)
 	# Rendering device
 	var rendering_device = RenderingServer.get_rendering_device()
 	# Texture (Fetch)
@@ -39,11 +47,20 @@ static func create_texture_rid(name: String, resolution : Vector2i) -> RID:
 	rid_texture_map[name] = texture_rid
 	return texture_rid
 
-static func fetch_texture_rid(name: String) -> RID:
+static func fetch_texture_rid(name: StringName) -> RID:
 	if rid_texture_map.has(name):
 		return rid_texture_map[name]
 	else: return RID()
-		
+
+static func write_texture_rid_to_sub_viewport(texture_rid : RID, sub_viewport : SubViewport):
+	# Rendering device
+	var rendering_device = RenderingServer.get_rendering_device()
+	# Image
+	var texture_data : PackedByteArray = rendering_device.texture_get_data(texture_rid, 0);
+	var texture_format = rendering_device.texture_get_format(texture_rid)
+	# Sub Viewport
+	sub_viewport.size = Vector2(texture_format.width,texture_format.height)
+			
 static func write_texture_rid_to_image(texture_rid : RID, image : Image) -> void:
 	# Rendering device
 	var rendering_device = RenderingServer.get_rendering_device()
@@ -54,7 +71,12 @@ static func write_texture_rid_to_image(texture_rid : RID, image : Image) -> void
 			
 static func editor_enter(editor_plugin : EditorPlugin) -> void:
 	if Engine.is_editor_hint():
-		# Image preview
+		# Preview
+		editor_preview_texture_rect = TextureRect.new()
+		editor_preview_image = Image.new()
+		editor_preview_control = Control.new()
+		editor_preview_control.add_child(editor_preview_texture_rect, true)
+		editor_plugin.add_control_to_container(editor_plugin.CONTAINER_SPATIAL_EDITOR_SIDE_LEFT,editor_preview_control)
 		# Moved to process so we can use gpu
 		# Presets button (Spatial)
 		editor_button_spatial = MenuButton.new()
@@ -71,6 +93,11 @@ static func editor_enter(editor_plugin : EditorPlugin) -> void:
 
 static func editor_exit(editor_plugin : EditorPlugin) -> void:
 	if Engine.is_editor_hint():
+		# Preview
+		editor_preview_texture_rect.free()
+		editor_preview_texture_rect = null
+		editor_preview_image.free()
+		editor_preview_image = null
 		# Presets button (Spatial)
 		editor_plugin.remove_control_from_container(editor_plugin.CONTAINER_SPATIAL_EDITOR_MENU, editor_button_spatial)
 		editor_button_spatial.queue_free()
@@ -83,6 +110,10 @@ static func editor_exit(editor_plugin : EditorPlugin) -> void:
 		
 static func editor_process(editor_plugin : EditorPlugin, delta: float) -> void:
 	if Engine.is_editor_hint():
+		var r = ReframeCompositorUtilities.fetch_texture_rid("preview")
+		if r:
+			ReframeCompositorUtilities.write_texture_rid_to_image(r,editor_preview_image )
+			editor_preview_texture_rect.texture = ImageTexture.create_from_image(editor_preview_image)
 		# Selected nodes
 		var selected_nodes: Array = EditorInterface.get_selection().get_selected_nodes()
 		# Presets (Visible)

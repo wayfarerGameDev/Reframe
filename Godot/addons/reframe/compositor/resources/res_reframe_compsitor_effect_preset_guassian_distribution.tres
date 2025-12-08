@@ -23,7 +23,7 @@ float GaussianDistribution(vec2 index)
     return sqrt(-2.0 * log(u1)) * cos(6.2831853 * u2);
 }"
 main = "// Gauss a
-float x =  GaussianDistribution(index + vec2(3,5));
-float y =  GaussianDistribution(index + vec2(1024,1024));
+float x =  GaussianDistribution(index_in + vec2(3,5));
+float y =  GaussianDistribution(index_in + vec2(1024,1024));
 color = vec4(x,y,0,1);"
 metadata/_custom_type_script = "uid://b88yvpo0ox613"

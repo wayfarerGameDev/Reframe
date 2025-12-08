@@ -17,7 +17,7 @@ const int DITHER_MATRIX[16] = int[](
 );
 
 // Dither
-const int dither_index =  index.x % 4 +  index.y % 4 * 4;
+const int dither_index =  index_in.x % 4 +  index_in.y % 4 * 4;
 const float dither = float(DITHER_MATRIX[dither_index]) / dithering_normalization_factor * dithering_strength * 0.1;
 color.rgb += vec3(dither);"
 metadata/_custom_type_script = "uid://b88yvpo0ox613"

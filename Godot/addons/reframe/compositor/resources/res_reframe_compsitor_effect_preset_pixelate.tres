@@ -7,5 +7,5 @@ script = ExtResource("1_hrroo")
 name = "Pixelation"
 main = "// Pixelate
 const int pixelation_factor = 4;
-color.rgb =   mix(color.rgb,imageLoad(image_scene_color, (index / pixelation_factor) * pixelation_factor).rgb,world_alpha_in);"
+color.rgb =   mix(color.rgb,imageLoad(image_scene_color, (index_in / pixelation_factor) * pixelation_factor).rgb,world_alpha_in);"
 metadata/_custom_type_script = "uid://b88yvpo0ox613"

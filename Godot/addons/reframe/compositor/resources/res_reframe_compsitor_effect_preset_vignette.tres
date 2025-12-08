@@ -4,11 +4,12 @@
 
 [resource]
 script = ExtResource("1_13rnp")
+name = &"Vignette"
 main = "// Vignette
 float radius = 2;
 float softness = 3;
-vec2 normalized_uv = (uv /resolution) * 2.0 - 1.0;
+vec2 normalized_uv = (uv_in /world_resolution_in) * 2.0 - 1.0;
 float dist_sq = dot(normalized_uv, normalized_uv);
 float vignette_factor = smoothstep(radius, radius - softness, dist_sq);
-color.rgb = mix(color.rgb, color.rgb * vignette_factor,alpha);"
+color.rgb = mix(color.rgb, color.rgb * vignette_factor,world_alpha_in);"
 metadata/_custom_type_script = "uid://b88yvpo0ox613"

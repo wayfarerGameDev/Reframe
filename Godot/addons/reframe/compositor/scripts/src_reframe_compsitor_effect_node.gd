@@ -4,12 +4,11 @@ class_name ReframeCompsitorEffectNode
 
 
 enum TargetCompositorMode { WORLD_ENVIORMENT }
-	
 # Parameters
 @export_group("Uniforms")
 @export var uniforms : Array
 @export_group("World")
-@export var world_resolution : Vector2i = Vector2i(256,256)
+@export var world_resolution : Vector2i
 @export var world_alpha: float = 1
 @export_group("Code")
 @export_multiline var functions : String = ""
@@ -67,8 +66,10 @@ func _process(delta: float) -> void:
 	# Add
 	add_to_compositor()
 	
-
 func create_effect() -> void:
+	# Resolution
+	world_resolution.x = clamp(world_resolution.x, ReframeCompositorUtilities.RESOLUTION_TEXTURE_MIN.x, ReframeCompositorUtilities.RESOLUTION_TEXTURE_MAX.x)
+	world_resolution.y = clamp(world_resolution.y, ReframeCompositorUtilities.RESOLUTION_TEXTURE_MIN.y, ReframeCompositorUtilities.RESOLUTION_TEXTURE_MAX.y)
 	# Compute shader
 	if refram_compute_shader == null:
 		refram_compute_shader = ReframeCompositorComputeShader.new()
