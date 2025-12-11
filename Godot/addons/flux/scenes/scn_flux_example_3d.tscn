@@ -1,0 +1,55 @@
+[gd_scene format=3 uid="uid://jp7wxi1kveij"]
+
+[ext_resource type="Script" uid="uid://c5sewgecqeh07" path="res://addons/flux/scripts/src_compute_effect_node.gd" id="2_rvnsf"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_lxjri"]
+
+[sub_resource type="Sky" id="Sky_6r6et"]
+sky_material = SubResource("ProceduralSkyMaterial_lxjri")
+
+[sub_resource type="Environment" id="Environment_lxjri"]
+background_mode = 2
+sky = SubResource("Sky_6r6et")
+
+[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_lxjri"]
+
+[sub_resource type="Compositor" id="Compositor_c6avi"]
+
+[node name="Node3D" type="Node3D" unique_id=373369695]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1014975647]
+environment = SubResource("Environment_lxjri")
+camera_attributes = SubResource("CameraAttributesPractical_lxjri")
+compositor = SubResource("Compositor_c6avi")
+
+[node name="------World Enviorment--------" type="Node" parent="." unique_id=238037195]
+
+[node name="------Render Targets------" type="Node" parent="." unique_id=1509836420]
+
+[node name="FluxEffect_GuassianDistribution" type="Node" parent="------Render Targets------" unique_id=1420945523]
+script = ExtResource("2_rvnsf")
+uniforms = [&"preview"]
+world_resolution = Vector2i(256, 256)
+functions = "float RandValueByIndex(vec2 index)
+{
+    vec3 p3 = fract(vec3(index.x, index.y, index.x) * 0.1031);  // Scramble index into small range for each channel 
+    p3 += dot(p3, p3.yzx + 33.33);                                                                      // Scrables by shuffling yxz to remove repetition
+    return fract((p3.x + p3.y) * p3.z);                                                                // Collapse and ensure range of 0-1
+}
+
+float GaussianDistribution(vec2 index)
+{
+    /*
+    Uses Box-Muller transform to calculate guass/normal distribution from to pair numbers between 0-1
+    mean = 0, std dev = 1
+    */
+    float u1 = max(RandValueByIndex(index), 1e-6);
+    float u2 = RandValueByIndex(index + vec2(17.0, 23.0));    
+    return sqrt(-2.0 * log(u1)) * cos(6.2831853 * u2);
+}"
+main = "// Gauss a
+float x =  GaussianDistribution(index_in + vec2(3,5));
+float y =  GaussianDistribution(index_in + vec2(1024,1024));
+color = vec4(x,y,0,1);"
+domain = 1
+metadata/_custom_type_script = "uid://c5sewgecqeh07"

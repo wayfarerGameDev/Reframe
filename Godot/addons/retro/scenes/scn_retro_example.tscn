@@ -1,0 +1,57 @@
+[gd_scene format=3 uid="uid://bstmic73abm6k"]
+
+[ext_resource type="Script" uid="uid://b4eor8xcneiix" path="res://addons/retro/scripts/src_retro_settings.gd" id="1_whcre"]
+[ext_resource type="Shader" uid="uid://x85xdsx2dvb8" path="res://addons/retro/shaders/sdr__retro_post_process.gdshader" id="2_ooig5"]
+[ext_resource type="Texture2D" uid="uid://cmqjyf7hdfo84" path="res://addons/retro/textures/tex_retro_dither_matrix_ps1_4x4.png" id="3_whcre"]
+[ext_resource type="PackedScene" uid="uid://bpfmunsh25v5l" path="res://addons/retro/particles/prt_retro_snow.tscn" id="5_56ciw"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_pth87"]
+ground_curve = 0.0672719
+use_debanding = false
+
+[sub_resource type="Sky" id="Sky_pjyox"]
+sky_material = SubResource("ProceduralSkyMaterial_pth87")
+
+[sub_resource type="Environment" id="Environment_fu8rj"]
+background_mode = 2
+background_color = Color(0.32491022, 0.3249102, 0.32491016, 1)
+sky = SubResource("Sky_pjyox")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="Compositor" id="Compositor_syaye"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_vrpkw"]
+
+[node name="Scene" type="Node3D" unique_id=360406882]
+
+[node name="RetroSettings" type="Node3D" parent="." unique_id=1823916383 node_paths=PackedStringArray("light_directional_light")]
+script = ExtResource("1_whcre")
+post_processing_shader = ExtResource("2_ooig5")
+resolution = Vector2i(320, 240)
+dithering_matrix_texture = ExtResource("3_whcre")
+vertex_jitter_strength = 20.0
+fog_mode = 0
+fog_depth_precision = 128.0
+light_directional_light = NodePath("../DirectionalLight3D")
+light_directional_direction = Vector3(0.37731612, 0.4175012, 0.826635)
+light_directional_color = Color(0.51809675, 6.497651e-07, 4.813075e-08, 1)
+metadata/_custom_type_script = "uid://b4eor8xcneiix"
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=984969227]
+transform = Transform3D(-0.8110088, -0.44709885, -0.37731612, -0.28197315, 0.86381936, -0.4175012, 0.51259714, -0.23220412, -0.826635, 0, 10, 0)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=915906661]
+environment = SubResource("Environment_fu8rj")
+compositor = SubResource("Compositor_syaye")
+
+[node name="Camera" type="CharacterBody3D" parent="." unique_id=946704437]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.7691307, 3.650188, -8.918306)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Camera" unique_id=648804489]
+shape = SubResource("SphereShape3D_vrpkw")
+
+[node name="Enviorment" type="Node3D" parent="." unique_id=552675717]
+
+[node name="ReframeRetroParticleSnow" parent="." unique_id=1490217167 instance=ExtResource("5_56ciw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.7691307, 3.650188, -8.918306)

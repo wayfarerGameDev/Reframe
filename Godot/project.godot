@@ -21,7 +21,7 @@ window/stretch/mode="viewport"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/reframe/plugin.cfg", "res://addons/script-ide/plugin.cfg")
+enabled=PackedStringArray("res://addons/flux/plugin.cfg", "res://addons/retro/plugin.cfg")
 
 [physics]
 

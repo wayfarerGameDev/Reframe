@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ReframeCompositorEffectPreset" format=3 uid="uid://pd3ixeq1n1qg"]
+
+[ext_resource type="Script" uid="uid://b88yvpo0ox613" path="res://addons/flux/scripts/src_flux_effect_preset.gd" id="1_w7mdw"]
+
+[resource]
+script = ExtResource("1_w7mdw")
+name = "Grayscale"
+main = "// Grayscale
+color.rgb = mix(color.rgb,vec3(dot(color.rgb, vec3(0.2126, 0.7152, 0.0722))),world_alpha_in);"
+metadata/_custom_type_script = "uid://b88yvpo0ox613"
