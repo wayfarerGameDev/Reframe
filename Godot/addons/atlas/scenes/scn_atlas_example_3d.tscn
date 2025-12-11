@@ -1,0 +1,54 @@
+[gd_scene format=3 uid="uid://btck7vhbbhwdk"]
+
+[ext_resource type="ArrayMesh" uid="uid://ck3wsvvtwy6hb" path="res://addons/atlas/meshes/msh_atlas_plane.obj" id="1_ylaaa"]
+[ext_resource type="Material" uid="uid://c3e60jtbot2gj" path="res://addons/atlas/materials/mat_atlas_height_wireframe.tres" id="2_22lk1"]
+[ext_resource type="Script" uid="uid://ctt23p0m3emhp" path="res://addons/atlas/scripts/src_atlas_cascade_node.gd" id="4_3mxlu"]
+[ext_resource type="Script" uid="uid://d218t55fwr0pu" path="res://addons/atlas/scripts/scr_atlas_master_node.gd" id="5_58sj5"]
+[ext_resource type="Texture2D" uid="uid://cwa5b605oybh2" path="res://addons/atlas/textures/tex_atlas_island_01.png" id="6_u58v1"]
+[ext_resource type="Texture2D" uid="uid://b0hfsnyjyl1b8" path="res://addons/atlas/textures/tex_atlas_island_02.png" id="7_22lk1"]
+[ext_resource type="Texture2D" uid="uid://bgi7cugkcdse3" path="res://addons/atlas/textures/tex_atlas_island_04.png" id="7_u7hve"]
+[ext_resource type="Texture2D" uid="uid://cxcxrrse0h2tg" path="res://addons/atlas/textures/tex_atlas_island_03.png" id="8_u58v1"]
+
+[sub_resource type="Environment" id="Environment_22lk1"]
+background_mode = 1
+
+[node name="Node3D" type="Node3D" unique_id=373369695]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1213667140]
+environment = SubResource("Environment_22lk1")
+
+[node name="AtlasMaster3D" type="Node3D" parent="." unique_id=201887503]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 53.2, 0, 1453.64)
+script = ExtResource("5_58sj5")
+metadata/_custom_type_script = "uid://d218t55fwr0pu"
+
+[node name="Mesh" type="MeshInstance3D" parent="AtlasMaster3D" unique_id=467380068]
+transform = Transform3D(500, 0, 0, 0, 1, 0, 0, 0, 500, 0, 0, 0)
+mesh = ExtResource("1_ylaaa")
+surface_material_override/0 = ExtResource("2_22lk1")
+
+[node name="AtlasCascade_Cliffs" type="Node3D" parent="AtlasMaster3D" unique_id=1673550515]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.5258789e-05)
+script = ExtResource("4_3mxlu")
+texture = ExtResource("7_22lk1")
+world = Vector4(1000, 1000, 300, 0.3)
+metadata/_custom_type_script = "uid://ctt23p0m3emhp"
+
+[node name="AtlasCascade_Large" type="Node3D" parent="AtlasMaster3D" unique_id=1431220132]
+script = ExtResource("4_3mxlu")
+texture = ExtResource("8_u58v1")
+world = Vector4(0, 1, 100, 1)
+metadata/_custom_type_script = "uid://ctt23p0m3emhp"
+
+[node name="AtlasCascade_Medium" type="Node3D" parent="AtlasMaster3D" unique_id=1623924277]
+script = ExtResource("4_3mxlu")
+texture = ExtResource("7_u7hve")
+world = Vector4(300, 300, 50, 1)
+metadata/_custom_type_script = "uid://ctt23p0m3emhp"
+
+[node name="AtlasCascade_Small" type="Node3D" parent="AtlasMaster3D" unique_id=316836368]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.5258789e-05)
+script = ExtResource("4_3mxlu")
+texture = ExtResource("6_u58v1")
+world = Vector4(1000, 1000, 20, 2.455)
+metadata/_custom_type_script = "uid://ctt23p0m3emhp"

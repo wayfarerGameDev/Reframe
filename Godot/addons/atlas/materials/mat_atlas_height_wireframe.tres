@@ -1,0 +1,14 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://c3e60jtbot2gj"]
+
+[ext_resource type="Shader" uid="uid://cw32ui2cbv6pw" path="res://addons/atlas/shaders/sdr_atlas_height_wireframe.gdshader" id="1_y662l"]
+[ext_resource type="Texture2D" uid="uid://cxcxrrse0h2tg" path="res://addons/atlas/textures/tex_atlas_island_03.png" id="2_rp1gv"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_y662l")
+shader_parameter/cascade_heightmap_0 = ExtResource("2_rp1gv")
+shader_parameter/cascade_world_0 = Vector4(0, 1, 50, 1)
+shader_parameter/cascade_world_1 = Vector4(0, 0, 0, 0)
+shader_parameter/cascade_world_2 = Vector4(0, 0, 0, 0)
+shader_parameter/cascade_world_3 = Vector4(0, 0, 0, 0)
+shader_parameter/base_world = Vector4(-21019.428, 0, 1, 1)
