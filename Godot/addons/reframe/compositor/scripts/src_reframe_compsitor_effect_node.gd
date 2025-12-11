@@ -63,8 +63,17 @@ func _process(delta: float) -> void:
 	# Editor warning
 	if Engine.is_editor_hint():
 		update_configuration_warnings()
-	# Add
-	add_to_compositor()
+	# Domain (Compositor)
+	if domain == ReframeCompositorComputeShader.Domain.COMPOSITOR:
+		add_to_compositor()
+	# Domain (Render Target)
+	else:
+		refram_compute_shader.dispatch_shader_to_render_target()
+		remove_from_compositor()
+
+func preview() -> void:
+	if Engine.is_editor_hint():
+		refram_compute_shader.preview()		
 	
 func create_effect() -> void:
 	# Resolution

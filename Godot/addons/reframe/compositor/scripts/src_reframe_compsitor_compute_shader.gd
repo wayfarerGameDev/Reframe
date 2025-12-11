@@ -113,7 +113,7 @@ func compile_shader() -> bool:
 	# Create compute shader from compiled shader
 	pipeline = rendering_device.compute_pipeline_create(shader)
 	return pipeline.is_valid()
-	
+		
 func render_callback(p_effect_callback_type, p_render_data):
 	dispatch_shader_to_compositor(p_effect_callback_type, p_render_data)
 	dispatch_shader_to_render_target()
@@ -134,9 +134,10 @@ func dispatch_shader_to_compositor(p_effect_callback_type, p_render_data):
 
 func dispatch_shader_to_render_target():
 	if domain == Domain.RENDERTARGET and compile_shader():
+		# Core
 		for uniform in uniforms:
 			if typeof(uniform) == TYPE_STRING_NAME and uniform != "":
-				ReframeCompositorUtilities.create_texture_rid(uniform, world_resolution)
+				var source_rid = ReframeCompositorUtilities.create_texture_rid(uniform, world_resolution)
 				image_target = ReframeCompositorUtilities.fetch_texture_rid(uniform)
 				dispatch_shader()
 
