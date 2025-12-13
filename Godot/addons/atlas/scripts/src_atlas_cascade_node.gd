@@ -7,13 +7,10 @@ class_name AtlasCascadeNode3D
 	set(value):
 		texture = value
 		rebuild()
-		pass
-@export var world : Vector4 = Vector4(0,1,0,0):
-	set(value):
-		world = value
-		rebuild()
-		pass
+
 var is_visible_previous : bool = false
+var world : Vector4
+var world_previous : Vector4
 
 func find_first_world_enviorment(root: Node = get_tree().root) -> WorldEnvironment:
 	if root is WorldEnvironment:
@@ -32,6 +29,8 @@ func _notification(what):
 		rebuild()
 	# Move
 	if what == NOTIFICATION_DRAG_END:
+		rebuild()
+	if what == NOTIFICATION_TRANSFORM_CHANGED or what == NOTIFICATION_TRANSFORM_CHANGED:
 		rebuild()
 
 func _get_configuration_warnings() -> PackedStringArray:
@@ -52,7 +51,12 @@ func _process(delta: float) -> void:
 	if visible != is_visible_previous:
 		rebuild()
 	is_visible_previous = visible
-		
+	# World
+	world = Vector4(position.x, position.z,position.y,scale.y)
+	if world != world_previous:
+		rebuild()
+	world_previous = world
+	
 func rebuild() -> void:
 	var parent = get_parent()
 	if parent is AtlasMasterNode3D:

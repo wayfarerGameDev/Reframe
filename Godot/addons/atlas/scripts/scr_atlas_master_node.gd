@@ -54,4 +54,4 @@ func rebuild_cascades() -> void:
 	if material:
 		for i in range(CASCADE_COUNT_MAX):
 			material.set_shader_parameter("cascade_heightmap_" + str(i), cascade_textures[i])
-			material.set_shader_parameter("cascade_world_" + str(i), cascade_worlds[i])
+			material.set_shader_parameter("cascade_world_" + str(i), Vector4(cascade_worlds[i]))
