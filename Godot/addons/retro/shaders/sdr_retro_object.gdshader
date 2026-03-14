@@ -1,3 +1,8 @@
+// Defines
+#define VERTEX_JITTER_CLIP_SPACE 0
+#define VERTEX_JITTER_VIEW_SPACE 1
+#define VERTEX_JITTER_SPACE VERTEX_JITTER_CLIP_SPACE
+
 shader_type spatial;
 render_mode specular_disabled, unshaded;
 
@@ -57,27 +62,34 @@ void vertex()
 	// Vertex Jitter
 	// Ps1 accurate jitter done in clip space
 	// Dependant on resolution
+	#if VERTEX_JITTER_SPACE == VERTEX_JITTER_CLIP_SPACE
 	clip_space.xy = (round(screen_space / (retro_vertex_jitter_strength)) * retro_vertex_jitter_strength / VIEWPORT_SIZE.xy) * clip_space.w;
-	POSITION = clip_space;
-
+	POSITION = clip_space;	
+	#endif
+	
 	// Vertex Jitter
 	// Done in view_space, not authentic to ps1 but more stylized
 	// Not dependant on resolution
-	// vec3 snapped_pos = floor(view_space.xyz / (retro_vertex_jitter_strength * 0.01)) * retro_vertex_jitter_strength * 0.01;
-	// vec3 jitter_offset = snapped_pos - view_space.xyz;
-	// VERTEX += (inverse(MODEL_MATRIX) * vec4(jitter_offset * view_space.z, 0.0)).xyz * clip_space.w;
-
+	#if VERTEX_JITTER_SPACE == VERTEX_JITTER_VIEW_SPACE
+	float step_size = retro_vertex_jitter_strength * 0.0025; 
+	POSITION = PROJECTION_MATRIX * vec4(floor(view_space.xyz / step_size) * step_size, view_space.w);
+	#endif
+	
 	// Light (Directional)
 	// PS1 Per-Vertex Shading (Gouraud shading)
 	float light_dot = clamp(dot(NORMAL,normalize(retro_light_directional_direction)),0,1);
 	vec4 light = retro_light_directional_color + retro_light_directional_intensity * light_dot;
 	vec3 light_factor = clamp(light.rgb,vec3(0),vec3(1));
-
+	
 	// Affine texture mapping
 	// PS1 affine uses clip-space W
 	// Must be applied things like lighting and fog
 	texture_affine_mapping_uv = UV * clip_space_w;
-	COLOR.rgb = light_factor * clip_space_w;
+	
+	// Lighting	
+	// Use the normal perspective-corrected lighting
+	// COLOR.rgb = light_factor * clip_space_w;
+	COLOR.rgb = light_factor;
 }
 
 void fragment()
@@ -89,8 +101,12 @@ void fragment()
 	// PS1 affine uses clip-space W
 	// Undo perspective UVs
 	uv = mix(uv, texture_affine_mapping_uv / clip_space_w, retro_affine_texture_mapping_strength);
-	vec3 vertex_color = mix(COLOR.rgb, COLOR.rgb / clip_space_w,  retro_affine_texture_mapping_strength);
-
+	
+	// Lighting
+	// Use the normal perspective-corrected lighting
+	// vec3 vertex_color = mix(COLOR.rgb, COLOR.rgb / clip_space_w,  retro_affine_texture_mapping_strength);
+	vec3 vertex_color = COLOR.rgb;
+	
 	// Repeat texture
 	if (repeat_factor > 0.0)
 	{
@@ -142,6 +158,6 @@ void fragment()
 
 void light()
 {
-	DIFFUSE_LIGHT = vec3(1);
-	SPECULAR_LIGHT = vec3(0);
+	// DIFFUSE_LIGHT = vec3(1);
+	// SPECULAR_LIGHT = vec3(0);
 }

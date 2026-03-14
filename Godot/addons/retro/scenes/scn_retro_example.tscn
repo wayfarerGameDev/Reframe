@@ -1,9 +1,14 @@
 [gd_scene format=3 uid="uid://bstmic73abm6k"]
 
 [ext_resource type="Script" uid="uid://b4eor8xcneiix" path="res://addons/retro/scripts/src_retro_settings.gd" id="1_whcre"]
-[ext_resource type="Shader" uid="uid://x85xdsx2dvb8" path="res://addons/retro/shaders/sdr__retro_post_process.gdshader" id="2_ooig5"]
+[ext_resource type="Shader" uid="uid://x85xdsx2dvb8" path="res://addons/retro/shaders/sdr_retro_post_process.gdshader" id="2_ooig5"]
 [ext_resource type="Texture2D" uid="uid://cmqjyf7hdfo84" path="res://addons/retro/textures/tex_retro_dither_matrix_ps1_4x4.png" id="3_whcre"]
+[ext_resource type="ArrayMesh" uid="uid://cl80o1ow8rxrj" path="res://addons/retro/meshes/mesh_retro_crate.obj" id="5_00ko0"]
 [ext_resource type="PackedScene" uid="uid://bpfmunsh25v5l" path="res://addons/retro/particles/prt_retro_snow.tscn" id="5_56ciw"]
+[ext_resource type="Shader" uid="uid://612q4qpqb7gh" path="res://addons/retro/shaders/sdr_retro_object.gdshader" id="6_c7d13"]
+[ext_resource type="Texture2D" uid="uid://bkaksukvbnvnv" path="res://addons/retro/textures/tex_retro_crate.png" id="7_akovk"]
+[ext_resource type="Texture2D" uid="uid://dbxx8jop17pc1" path="res://addons/retro/textures/tex_retro_floor_concrete.PNG" id="8_akovk"]
+[ext_resource type="ArrayMesh" uid="uid://b48ms3lwks8cj" path="res://addons/retro/meshes/mesh_retro_floor_10x10.obj" id="8_c7d13"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_pth87"]
 ground_curve = 0.0672719
@@ -23,6 +28,20 @@ glow_enabled = true
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_vrpkw"]
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_fb1r1"]
+render_priority = 0
+shader = ExtResource("6_c7d13")
+shader_parameter/billboard = false
+shader_parameter/repeat_factor = 0.0
+shader_parameter/albedo_texture = ExtResource("7_akovk")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ewmc2"]
+render_priority = 0
+shader = ExtResource("6_c7d13")
+shader_parameter/billboard = false
+shader_parameter/repeat_factor = 5.0
+shader_parameter/albedo_texture = ExtResource("8_akovk")
+
 [node name="Scene" type="Node3D" unique_id=360406882]
 
 [node name="RetroSettings" type="Node3D" parent="." unique_id=1823916383 node_paths=PackedStringArray("light_directional_light")]
@@ -30,12 +49,12 @@ script = ExtResource("1_whcre")
 post_processing_shader = ExtResource("2_ooig5")
 resolution = Vector2i(320, 240)
 dithering_matrix_texture = ExtResource("3_whcre")
-vertex_jitter_strength = 20.0
+vertex_jitter_strength = 15.0
 fog_mode = 0
 fog_depth_precision = 128.0
 light_directional_light = NodePath("../DirectionalLight3D")
 light_directional_direction = Vector3(0.37731612, 0.4175012, 0.826635)
-light_directional_color = Color(0.51809675, 6.497651e-07, 4.813075e-08, 1)
+light_directional_color = Color(1, 1, 1, 1)
 metadata/_custom_type_script = "uid://b4eor8xcneiix"
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=984969227]
@@ -51,7 +70,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.7691307, 3.650188, -8.91830
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Camera" unique_id=648804489]
 shape = SubResource("SphereShape3D_vrpkw")
 
-[node name="Enviorment" type="Node3D" parent="." unique_id=552675717]
-
-[node name="ReframeRetroParticleSnow" parent="." unique_id=1490217167 instance=ExtResource("5_56ciw")]
+[node name="Snow" parent="." unique_id=1490217167 instance=ExtResource("5_56ciw")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.7691307, 3.650188, -8.918306)
+
+[node name="Crate" type="MeshInstance3D" parent="." unique_id=264904257]
+mesh = ExtResource("5_00ko0")
+surface_material_override/0 = SubResource("ShaderMaterial_fb1r1")
+
+[node name="Floor" type="MeshInstance3D" parent="." unique_id=1702570940]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.8217154, 0)
+material_override = SubResource("ShaderMaterial_ewmc2")
+mesh = ExtResource("8_c7d13")

@@ -3,8 +3,8 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dbxx8jop17pc1"
-path.s3tc="res://.godot/imported/tex_reframe_retro_floor_concrete.PNG-42aa2ffa97586f355fbf06230d53efca.s3tc.ctex"
-path.etc2="res://.godot/imported/tex_reframe_retro_floor_concrete.PNG-42aa2ffa97586f355fbf06230d53efca.etc2.ctex"
+path.s3tc="res://.godot/imported/tex_retro_floor_concrete.PNG-8fb7fa442c6c6550e8e4e44cc1c28cae.s3tc.ctex"
+path.etc2="res://.godot/imported/tex_retro_floor_concrete.PNG-8fb7fa442c6c6550e8e4e44cc1c28cae.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
@@ -12,8 +12,8 @@ metadata={
 
 [deps]
 
-source_file="res://addons/retro/textures/tex_reframe_retro_floor_concrete.PNG"
-dest_files=["res://.godot/imported/tex_reframe_retro_floor_concrete.PNG-42aa2ffa97586f355fbf06230d53efca.s3tc.ctex", "res://.godot/imported/tex_reframe_retro_floor_concrete.PNG-42aa2ffa97586f355fbf06230d53efca.etc2.ctex"]
+source_file="res://addons/retro/textures/tex_retro_floor_concrete.PNG"
+dest_files=["res://.godot/imported/tex_retro_floor_concrete.PNG-8fb7fa442c6c6550e8e4e44cc1c28cae.s3tc.ctex", "res://.godot/imported/tex_retro_floor_concrete.PNG-8fb7fa442c6c6550e8e4e44cc1c28cae.etc2.ctex"]
 
 [params]
 

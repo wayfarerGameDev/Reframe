@@ -99,11 +99,11 @@ func _agent_batch_single_process_3d(delta:float, agent_in : int) -> void:
 	var agent_heading_current = agent_batch_heading_currents[agent_in]
 	var agent_heading_desired = agent_batch_heading_desireds[agent_in]
 	# Debug (Heading)
-	if agent_debug:
-		DebugDraw3D.draw_arrow_ray(agent_position, agent_heading_current,agent_radius,Color.YELLOW)
-		DebugDraw3D.draw_arrow_ray(agent_position, agent_heading_desired,agent_radius,Color.BLUE)
+	# if agent_debug:
+	#	DebugDraw3D.draw_arrow_ray(agent_position, agent_heading_current,agent_radius,Color.YELLOW)
+	#	DebugDraw3D.draw_arrow_ray(agent_position, agent_heading_desired,agent_radius,Color.BLUE)
 	# Process
-	for sample in samples:
+	# for sample in samples:
 		# Debug
-		if agent_debug == 1:
-			DebugDraw3D.draw_line(agent_position, agent_position + sample * agent_radius,Color.GREEN,0)
+	#	if agent_debug == 1:
+	#		DebugDraw3D.draw_line(agent_position, agent_position + sample * agent_radius,Color.GREEN,0)
