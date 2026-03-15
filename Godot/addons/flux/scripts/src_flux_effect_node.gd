@@ -22,13 +22,15 @@ var compositor_effect : FluxCompositorEffect
 var compositor : Compositor
 
 func find_first_world_enviorment(root: Node = get_tree().root) -> WorldEnvironment:
+	if root == null:
+		return null
 	if root is WorldEnvironment:
 		return root
 	for child in root.get_children():
 		var found := find_first_world_enviorment(child)
 		if found:
 			return found
-
+			
 	return null
 
 func _notification(what):

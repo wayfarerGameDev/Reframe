@@ -3,15 +3,19 @@ extends Node3D
 class_name RetroSettings
 
 enum ResolutionMode { Internal, Postprocessing }
-enum Mode { None, Individual, Postprocessing }
+enum VertexJitterMode { ClipSpace, ViewSapce }
+enum FogMode { None, ObjectVertex, ObjectPixel, Postprocessing }
+enum LightMode { None, ObjectVertex, ObjectPixel }
+enum Mode { None, Object, Postprocessing }
 
 @export_group("Shader")
-@export var post_processing_shader: Shader = load("res://addons/retro/shaders/sdr__retro_post_process.gdshader")
+@export var post_processing_shader: Shader = load("res://addons/retro/shaders/sdr_retro_post_process.gdshader")
 @export_group("Resolution")
 @export var resolution_mode : ResolutionMode = ResolutionMode.Postprocessing;
 @export var resolution : Vector2i = Vector2i(640, 480)
-@export_group("Affine texture mapping")
-@export var affine_texture_mapping_strength : float = 1
+@export_group("Texture")
+@export var texture_affine_mapping_strength : float = 1
+@export var texture_masking_threshold : float = 0.5
 @export_group("Color")
 @export var color_quantization_mode : Mode = Mode.Postprocessing;
 @export var color_quantization_depth : float = 31.0
@@ -19,14 +23,17 @@ enum Mode { None, Individual, Postprocessing }
 @export var dithering_mode : Mode = Mode.Postprocessing;
 @export var dithering_matrix_texture: Texture2D = load("res://addons/retro/textures/tex_retro_dither_matrix_ps1_4x4.png")
 @export var dithering_strength : float = 1
-@export_group("Jitter")
-@export var vertex_jitter_strength : float = 1
+@export_group("Vertex")
+@export var vertex_jitter_mode : VertexJitterMode = VertexJitterMode.ClipSpace
+@export var vertex_jitter_strength : float = 15
+@export var vertex_z_fighting_reduction : float = 0
 @export_group("Fog")
-@export var fog_mode : Mode = Mode.Postprocessing;
+@export var fog_mode : FogMode = FogMode.ObjectVertex;
 @export var fog_color : Color = Color.WHITE
 @export var fog_start_end_distance : Vector2 = Vector2(5,30)
 @export var fog_depth_precision : float = 32
-@export_group("Lighting: Directional")
+@export_group("Lighting")
+@export var light_mode : LightMode = LightMode.ObjectVertex
 @export var light_directional_light : DirectionalLight3D
 @export var light_directional_direction : Vector3 = Vector3(0,1,0);
 @export var light_directional_intensity : float = 1;
@@ -97,12 +104,16 @@ func global_shader_parameter_update() -> void:
 	RetroUtilities.global_shader_parameter_set("retro_resolution", RenderingServer.GLOBAL_VAR_TYPE_VEC2, resolution)
 	RetroUtilities.global_shader_parameter_set("retro_color_quantization_mode", RenderingServer.GLOBAL_VAR_TYPE_INT, color_quantization_mode)
 	RetroUtilities.global_shader_parameter_set("retro_color_quantization_depth", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, color_quantization_depth)
-	RetroUtilities.global_shader_parameter_set("retro_affine_texture_mapping_strength", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, affine_texture_mapping_strength)
+	RetroUtilities.global_shader_parameter_set("retro_texture_affine_mapping_strength", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, texture_affine_mapping_strength)
+	RetroUtilities.global_shader_parameter_set("retro_texture_masking_threshold", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, texture_masking_threshold)
+	RetroUtilities.global_shader_parameter_set("retro_vertex_jitter_mode", RenderingServer.GLOBAL_VAR_TYPE_INT, vertex_jitter_mode)
 	RetroUtilities.global_shader_parameter_set("retro_vertex_jitter_strength", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, max(vertex_jitter_strength,0.00001))
+	RetroUtilities.global_shader_parameter_set("retro_vertex_z_fighting_reduction", RenderingServer.GLOBAL_VAR_TYPE_FLOAT,vertex_z_fighting_reduction)
 	RetroUtilities.global_shader_parameter_set("retro_fog_mode", RenderingServer.GLOBAL_VAR_TYPE_INT, fog_mode)
 	RetroUtilities.global_shader_parameter_set("retro_fog_color", RenderingServer.GLOBAL_VAR_TYPE_VEC4, fog_color)
 	RetroUtilities.global_shader_parameter_set("retro_fog_start_end_distance", RenderingServer.GLOBAL_VAR_TYPE_VEC2, fog_start_end_distance)
 	RetroUtilities.global_shader_parameter_set("retro_fog_depth_precision", RenderingServer.GLOBAL_VAR_TYPE_INT, fog_depth_precision)
+	RetroUtilities.global_shader_parameter_set("retro_light_mode", RenderingServer.GLOBAL_VAR_TYPE_INT, light_mode)
 	RetroUtilities.global_shader_parameter_set("retro_light_directional_direction", RenderingServer.GLOBAL_VAR_TYPE_VEC3, light_directional_direction)
 	RetroUtilities.global_shader_parameter_set("retro_light_directional_intensity", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, light_directional_intensity)
 	RetroUtilities.global_shader_parameter_set("retro_light_directional_color", RenderingServer.GLOBAL_VAR_TYPE_VEC4, light_directional_color)

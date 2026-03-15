@@ -27,7 +27,7 @@ global uniform int retro_fog_depth_precision;
 // );
 
 uniform sampler2D SCREEN_TEXTURE: hint_screen_texture, filter_nearest;
-uniform sampler2D DEPTH_TEXTURE: hint_depth_texture, source_color;
+uniform sampler2D DEPTH_TEXTURE: hint_depth_texture, filter_nearest;
 
 void vertex()
 {
@@ -55,9 +55,10 @@ void fragment()
 
 	// Fog
 	// Depth precision gives banding look to give PS1 style
-	if (retro_fog_mode == 2)
+	if (retro_fog_mode == 3)
 	{
-		float fog_factor = clamp((-view.z - retro_fog_start_end_distance.x) / (retro_fog_start_end_distance.y - retro_fog_start_end_distance.x), 0.0, 1.0);
+		float fog_range = max(retro_fog_start_end_distance.y - retro_fog_start_end_distance.x, 0.001);
+		float fog_factor = clamp((-view.z - retro_fog_start_end_distance.x) / fog_range, 0.0, 1.0);
 		fog_factor = floor(fog_factor * float(retro_fog_depth_precision)) / float(retro_fog_depth_precision);
 		color = mix(color, retro_fog_color.rgb, fog_factor * retro_fog_color.a);
 	}

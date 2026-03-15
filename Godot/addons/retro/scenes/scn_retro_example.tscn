@@ -2,67 +2,59 @@
 
 [ext_resource type="Script" uid="uid://b4eor8xcneiix" path="res://addons/retro/scripts/src_retro_settings.gd" id="1_whcre"]
 [ext_resource type="Shader" uid="uid://x85xdsx2dvb8" path="res://addons/retro/shaders/sdr_retro_post_process.gdshader" id="2_ooig5"]
-[ext_resource type="Texture2D" uid="uid://cmqjyf7hdfo84" path="res://addons/retro/textures/tex_retro_dither_matrix_ps1_4x4.png" id="3_whcre"]
+[ext_resource type="Texture2D" uid="uid://v6l4lv2buemc" path="res://addons/retro/textures/tex_retro_dither_matrix_ps1_normalized_4x4.png" id="3_akovk"]
 [ext_resource type="ArrayMesh" uid="uid://cl80o1ow8rxrj" path="res://addons/retro/meshes/mesh_retro_crate.obj" id="5_00ko0"]
 [ext_resource type="PackedScene" uid="uid://bpfmunsh25v5l" path="res://addons/retro/particles/prt_retro_snow.tscn" id="5_56ciw"]
 [ext_resource type="Shader" uid="uid://612q4qpqb7gh" path="res://addons/retro/shaders/sdr_retro_object.gdshader" id="6_c7d13"]
 [ext_resource type="Texture2D" uid="uid://bkaksukvbnvnv" path="res://addons/retro/textures/tex_retro_crate.png" id="7_akovk"]
-[ext_resource type="Texture2D" uid="uid://dbxx8jop17pc1" path="res://addons/retro/textures/tex_retro_floor_concrete.PNG" id="8_akovk"]
 [ext_resource type="ArrayMesh" uid="uid://b48ms3lwks8cj" path="res://addons/retro/meshes/mesh_retro_floor_10x10.obj" id="8_c7d13"]
-
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_pth87"]
-ground_curve = 0.0672719
-use_debanding = false
-
-[sub_resource type="Sky" id="Sky_pjyox"]
-sky_material = SubResource("ProceduralSkyMaterial_pth87")
-
-[sub_resource type="Environment" id="Environment_fu8rj"]
-background_mode = 2
-background_color = Color(0.32491022, 0.3249102, 0.32491016, 1)
-sky = SubResource("Sky_pjyox")
-tonemap_mode = 2
-glow_enabled = true
-
-[sub_resource type="Compositor" id="Compositor_syaye"]
+[ext_resource type="Texture2D" uid="uid://dbxx8jop17pc1" path="res://addons/retro/textures/tex_retro_floor_concrete.PNG" id="8_fb1r1"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_vrpkw"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_fb1r1"]
 render_priority = 0
 shader = ExtResource("6_c7d13")
+shader_parameter/albedo_texture = ExtResource("7_akovk")
 shader_parameter/billboard = false
 shader_parameter/repeat_factor = 0.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_akovk"]
+render_priority = 0
+shader = ExtResource("6_c7d13")
 shader_parameter/albedo_texture = ExtResource("7_akovk")
+shader_parameter/billboard = false
+shader_parameter/repeat_factor = 0.0
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ewmc2"]
 render_priority = 0
 shader = ExtResource("6_c7d13")
+shader_parameter/albedo_texture = ExtResource("8_fb1r1")
 shader_parameter/billboard = false
 shader_parameter/repeat_factor = 5.0
-shader_parameter/albedo_texture = ExtResource("8_akovk")
 
 [node name="Scene" type="Node3D" unique_id=360406882]
 
 [node name="RetroSettings" type="Node3D" parent="." unique_id=1823916383 node_paths=PackedStringArray("light_directional_light")]
+transform = Transform3D(0.13492113, 0.3201018, 0.9377268, 0.23433709, 0.9092246, -0.34408894, -0.9627473, 0.2661688, 0.047661662, 0, 0, 0)
 script = ExtResource("1_whcre")
 post_processing_shader = ExtResource("2_ooig5")
 resolution = Vector2i(320, 240)
-dithering_matrix_texture = ExtResource("3_whcre")
-vertex_jitter_strength = 15.0
+color_quantization_mode = 1
+dithering_mode = 1
+dithering_matrix_texture = ExtResource("3_akovk")
+vertex_jitter_strength = 22.5
 fog_mode = 0
-fog_depth_precision = 128.0
-light_directional_light = NodePath("../DirectionalLight3D")
-light_directional_direction = Vector3(0.37731612, 0.4175012, 0.826635)
-light_directional_color = Color(1, 1, 1, 1)
+fog_start_end_distance = Vector2(1, 30)
+fog_depth_precision = 2048.0
+light_directional_light = NodePath("../DirectionalLight")
+light_directional_direction = Vector3(-0.14660297, 0.7936544, 0.5904408)
+light_directional_intensity = 100000000.0
+light_directional_color = Color(0.00037945056, 0.00037945056, 0.00037945056, 1)
 metadata/_custom_type_script = "uid://b4eor8xcneiix"
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=984969227]
-transform = Transform3D(-0.8110088, -0.44709885, -0.37731612, -0.28197315, 0.86381936, -0.4175012, 0.51259714, -0.23220412, -0.826635, 0, 10, 0)
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=915906661]
-environment = SubResource("Environment_fu8rj")
-compositor = SubResource("Compositor_syaye")
+[node name="DirectionalLight" type="DirectionalLight3D" parent="." unique_id=984969227]
+transform = Transform3D(0.7437384, 0.65219694, 0.14660297, 0.48197812, -0.3712275, -0.7936544, -0.4631959, 0.66093063, -0.5904408, 0, 0, 0)
 
 [node name="Camera" type="CharacterBody3D" parent="." unique_id=946704437]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.7691307, 3.650188, -8.918306)
@@ -74,8 +66,16 @@ shape = SubResource("SphereShape3D_vrpkw")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.7691307, 3.650188, -8.918306)
 
 [node name="Crate" type="MeshInstance3D" parent="." unique_id=264904257]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.8144326, 0)
 mesh = ExtResource("5_00ko0")
 surface_material_override/0 = SubResource("ShaderMaterial_fb1r1")
+
+[node name="CSGSphere3D" type="CSGSphere3D" parent="." unique_id=21064925]
+transform = Transform3D(0.1349211, 0.32010174, 0.9377268, 0.23433708, 0.9092246, -0.344089, -0.96274716, 0.2661688, 0.04766166, 1.7881393e-07, 2.425859, 6.586137)
+radius = 1.575
+radial_segments = 20
+rings = 20
+material = SubResource("ShaderMaterial_akovk")
 
 [node name="Floor" type="MeshInstance3D" parent="." unique_id=1702570940]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.8217154, 0)
