@@ -34,7 +34,7 @@ uniform sampler2D albedo_texture : source_color, filter_linear_mipmap, repeat_di
 #if TEXTURE_FILTERING == TEXTURE_FILTERING_PSX
 uniform sampler2D albedo_texture : source_color, filter_nearest, repeat_disable;
 #endif
-uniform bool billboard = false;
+uniform int billboard_mode : hint_enum("Disabled,Y,XYZ") = 0;
 uniform float repeat_factor = 0;
 
 // Dither matrix bassed on ps1 dither matrix
@@ -56,11 +56,10 @@ varying vec3 _local_normal;
 void vertex()
 {
 	// Billboard: face camera
-    if (billboard)
+    if (billboard_mode != 0)
 	{
         vec3 cam_right   = normalize(INV_VIEW_MATRIX[0].xyz);
-        vec3 cam_up      = vec3(0.0, 1.0, 0.0);
-       // vec3 cam_forward = normalize(INV_VIEW_MATRIX[2].xyz);
+		vec3 cam_up = mix(vec3(0.0, 1.0, 0.0), normalize(INV_VIEW_MATRIX[1].xyz), float(billboard_mode == 2));
         vec4 obj_position = MODEL_MATRIX[3];
     	VERTEX = obj_position.xyz + VERTEX.x * cam_right + VERTEX.y * cam_up;
 	}

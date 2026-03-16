@@ -16,21 +16,21 @@
 render_priority = 0
 shader = ExtResource("6_c7d13")
 shader_parameter/albedo_texture = ExtResource("7_akovk")
-shader_parameter/billboard = false
+shader_parameter/billboard_mode = 1
 shader_parameter/repeat_factor = 0.0
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_akovk"]
 render_priority = 0
 shader = ExtResource("6_c7d13")
 shader_parameter/albedo_texture = ExtResource("7_akovk")
-shader_parameter/billboard = false
+shader_parameter/billboard_mode = 0
 shader_parameter/repeat_factor = 0.0
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ewmc2"]
 render_priority = 0
 shader = ExtResource("6_c7d13")
 shader_parameter/albedo_texture = ExtResource("8_fb1r1")
-shader_parameter/billboard = false
+shader_parameter/billboard_mode = 0
 shader_parameter/repeat_factor = 5.0
 
 [node name="Scene" type="Node3D" unique_id=360406882]
