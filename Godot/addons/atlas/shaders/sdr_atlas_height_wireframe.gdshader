@@ -33,5 +33,5 @@ void vertex()
 
 void fragment() 
 {
-	ALBEDO = vec3(0.2, 0.5, 0.2); // Simple greenish terrain
+	ALBEDO = vec3(0.2, 0.5, 0.2);
 } 
