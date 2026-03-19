@@ -7,6 +7,10 @@ static func global_shader_parameters_defaults() -> void:
 	global_shader_parameter_set("retro_resolution", RenderingServer.GLOBAL_VAR_TYPE_VEC2, Vector2.ZERO)
 	global_shader_parameter_set("retro_color_quantization_mode", RenderingServer.GLOBAL_VAR_TYPE_INT, 0)
 	global_shader_parameter_set("retro_color_quantization_depth", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, 0)
+	global_shader_parameter_set("retro_color_palette_enabled", RenderingServer.GLOBAL_VAR_TYPE_BOOL, false)
+	global_shader_parameter_set_texture("retro_color_palette_texture", null)
+	global_shader_parameter_set("retro_color_palette_contrast", RenderingServer.GLOBAL_VAR_TYPE_FLOAT,1)
+	global_shader_parameter_set("retro_color_palette_brightness", RenderingServer.GLOBAL_VAR_TYPE_FLOAT,1)
 	global_shader_parameter_set("retro_texture_affine_mapping_strength", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, 0)
 	global_shader_parameter_set("retro_texture_masking_threshold", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, 0.5)
 	global_shader_parameter_set("retro_vertex_jitter_mode", RenderingServer.GLOBAL_VAR_TYPE_INT,1)
@@ -47,4 +51,34 @@ static func global_shader_parameter_set_texture(name: String, tex: Texture2D) ->
 		RenderingServer.global_shader_parameter_add(name, RenderingServer.GLOBAL_VAR_TYPE_SAMPLER2D, value)
 	else:
 		RenderingServer.global_shader_parameter_set(name, value)
+
+static func generate_palette_texture(colors: Array[Color], save_path: String) -> void:
+	if colors.is_empty(): return
 	
+	var img := Image.create(colors.size(), 1, false, Image.FORMAT_RGB8)
+	for i in range(colors.size()):
+		img.set_pixel(i, 0, colors[i])
+		
+	# Ensure directory exists
+	var dir_path = save_path.get_base_dir()
+	if not DirAccess.dir_exists_absolute(dir_path):
+		DirAccess.make_dir_recursive_absolute(dir_path)
+		
+	# Save image
+	img.save_png(save_path)
+	
+	# Force Editor to see and import the new file
+	if Engine.is_editor_hint():
+		var editor_interface = Engine.get_singleton("EditorInterface")
+		if editor_interface:
+			var res_filesystem = editor_interface.get_resource_filesystem()
+			res_filesystem.update_file(save_path)
+			res_filesystem.scan()
+			
+	# Force Editor to see and import the new file
+	if Engine.is_editor_hint():
+		var editor_interface = Engine.get_singleton("EditorInterface")
+		if editor_interface:
+			var res_filesystem = editor_interface.get_resource_filesystem()
+			res_filesystem.update_file(save_path)
+			res_filesystem.scan()

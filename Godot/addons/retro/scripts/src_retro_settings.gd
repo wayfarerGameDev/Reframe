@@ -21,6 +21,9 @@ enum Mode { None, Object, Postprocessing }
 @export_group("Color")
 @export var color_quantization_mode : Mode = Mode.Postprocessing;
 @export var color_quantization_depth : float = 31.0
+@export var color_palette_texture : Texture2D = null
+@export var color_palette_contrast : float = 1.0
+@export var color_palette_brightness : float = 1.0
 @export_group("Dithiring")
 @export var dithering_mode : Mode = Mode.Postprocessing;
 @export var dithering_matrix_texture: Texture2D = load("res://addons/retro/textures/tex_retro_dither_matrix_ps1_4x4.png")
@@ -42,6 +45,7 @@ enum Mode { None, Object, Postprocessing }
 @export var light_directional_color : Color = Color.BLACK;
 	
 var quad_instance: MeshInstance3D
+var _last_editor_post_process_state: bool = false
 		
 func _notification(what):
 	if Engine.is_editor_hint():
@@ -50,7 +54,7 @@ func _notification(what):
 			RetroUtilities.global_shader_parameters_defaults()
 			return
 		# Initalize
-		if  what == NOTIFICATION_ENTER_WORLD or what == NOTIFICATION_ENTER_TREE:
+		if	what == NOTIFICATION_ENTER_WORLD or what == NOTIFICATION_ENTER_TREE:
 			project_settings_update()
 			global_shader_parameter_update()
 			post_processing_update()
@@ -65,12 +69,25 @@ func _ready() -> void:
 	# Editor (continuous updates)
 	if Engine.is_editor_hint():
 		set_process_internal(true)
+		# Pull state from RenderingServer to ensure persistence after save
+		var bypass = RenderingServer.global_shader_parameter_get("retro_editor_bypass")
+		_last_editor_post_process_state = bypass if bypass != null else false
 	# Runtime
 	project_settings_update()
 	global_shader_parameter_update()
 	post_processing_update()
 			
 func _process(delta: float) -> void:
+	# Editor bypass override
+	if Engine.is_editor_hint():
+		# Ask RenderingServer directly as it survives script reloads/saves
+		var current_bypass_state = RenderingServer.global_shader_parameter_get("retro_editor_bypass")
+		if current_bypass_state == null: current_bypass_state = false
+		
+		if current_bypass_state != _last_editor_post_process_state:
+			_last_editor_post_process_state = current_bypass_state
+			post_processing_update()
+
 	# Set directional light direction
 	if light_directional_light != null:
 		var direction : Vector3 = -(light_directional_light.transform.basis.z).normalized()
@@ -101,16 +118,26 @@ func project_settings_update() -> void:
 	# Resolution mode (Postprocessing)
 	elif resolution_mode == ResolutionMode.Postprocessing:
 		root_window.content_scale_size = resolution
-		root_window.content_scale_mode = Window.CONTENT_SCALE_MODE_CANVAS_ITEMS 
+		root_window.content_scale_mode = Window.CONTENT_SCALE_MODE_CANVAS_ITEMS
 		root_window.content_scale_aspect = target_aspect
 		root_window.canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_LINEAR
 
 func global_shader_parameter_update() -> void:
+	
+	# Editor preview override for Internal mode
+	var effective_resolution_mode = resolution_mode
+	if Engine.is_editor_hint() and resolution_mode == ResolutionMode.Internal:
+		effective_resolution_mode = ResolutionMode.Postprocessing
+		
 	# Basic globals
-	RetroUtilities.global_shader_parameter_set("retro_resolution_mode", RenderingServer.GLOBAL_VAR_TYPE_INT, resolution_mode)
+	RetroUtilities.global_shader_parameter_set("retro_resolution_mode", RenderingServer.GLOBAL_VAR_TYPE_INT, effective_resolution_mode)
 	RetroUtilities.global_shader_parameter_set("retro_resolution", RenderingServer.GLOBAL_VAR_TYPE_VEC2, resolution)
 	RetroUtilities.global_shader_parameter_set("retro_color_quantization_mode", RenderingServer.GLOBAL_VAR_TYPE_INT, color_quantization_mode)
 	RetroUtilities.global_shader_parameter_set("retro_color_quantization_depth", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, color_quantization_depth)
+	RetroUtilities.global_shader_parameter_set("retro_color_palette_enabled", RenderingServer.GLOBAL_VAR_TYPE_BOOL, color_palette_texture != null)
+	RetroUtilities.global_shader_parameter_set_texture("retro_color_palette_texture", color_palette_texture)
+	RetroUtilities.global_shader_parameter_set("retro_color_palette_contrast", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, color_palette_contrast)
+	RetroUtilities.global_shader_parameter_set("retro_color_palette_brightness", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, color_palette_brightness * 0.1)
 	RetroUtilities.global_shader_parameter_set("retro_texture_affine_mapping_strength", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, texture_affine_mapping_strength)
 	RetroUtilities.global_shader_parameter_set("retro_texture_masking_threshold", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, texture_masking_threshold)
 	RetroUtilities.global_shader_parameter_set("retro_vertex_z_fighting_reduction", RenderingServer.GLOBAL_VAR_TYPE_FLOAT,vertex_z_fighting_reduction)
@@ -150,15 +177,29 @@ func global_shader_parameter_update() -> void:
 	
 func post_processing_update(force_rebuild: bool = false) -> void:
 	
+	# Editor preview override for Internal mode
+	var effective_resolution_mode = resolution_mode
+	if Engine.is_editor_hint() and resolution_mode == ResolutionMode.Internal:
+		effective_resolution_mode = ResolutionMode.Postprocessing
+	
+	# Check persistent state from RenderingServer
+	var is_enabled = RenderingServer.global_shader_parameter_get("retro_editor_bypass")
+	if is_enabled == null: is_enabled = false
+
 	# Validate postprocessing
 	var needs_post_processing: bool = (
-		resolution_mode == ResolutionMode.Postprocessing or
+		effective_resolution_mode == ResolutionMode.Postprocessing or
 		color_quantization_mode == Mode.Postprocessing or
 		dithering_mode == Mode.Postprocessing or
-		fog_mode == FogMode.Postprocessing
+		fog_mode == FogMode.Postprocessing or
+		(is_enabled and Engine.is_editor_hint())
 	)
 	
-	#  Delet post processing
+	# Editor bypass override
+	if Engine.is_editor_hint() and not is_enabled:
+		needs_post_processing = false
+	
+	#  Delete post processing
 	if not needs_post_processing:
 		if is_instance_valid(quad_instance):
 			quad_instance.queue_free()

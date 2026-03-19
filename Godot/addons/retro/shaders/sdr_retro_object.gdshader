@@ -77,8 +77,9 @@ void vertex()
 	// Dependant on resolution
 	if (retro_vertex_jitter_mode == 0)
 	{
-		clip_space.xy = (round(screen_space / (retro_vertex_jitter_strength)) * retro_vertex_jitter_strength / VIEWPORT_SIZE.xy) * clip_space.w;
-		POSITION = clip_space;	
+		vec2 snap_res = VIEWPORT_SIZE.xy / max(retro_vertex_jitter_strength, 0.001);
+		clip_space.xy = floor(clip_space.xy / clip_space.w * snap_res) / snap_res * clip_space.w;
+		POSITION = clip_space;
 	}
 	
 	// Vertex Jitter

@@ -6,8 +6,12 @@ global uniform int retro_resolution_mode;
 global uniform vec2 retro_resolution;
 global uniform int retro_color_quantization_mode;
 global uniform float retro_color_quantization_depth;
+global uniform bool retro_color_palette_enabled;
+global uniform float retro_color_palette_contrast;
+global uniform float retro_color_palette_brightness;
+global uniform sampler2D retro_color_palette_texture : source_color, filter_nearest;
 global uniform int retro_dithering_mode;
-global uniform sampler2D retro_dithering_matrix_texture : filter_nearest;
+global uniform sampler2D retro_dithering_matrix_texture : source_color, filter_nearest;
 global uniform float retro_dithering_strength;
 global uniform int   retro_dithering_matrix_size;
 global uniform int retro_fog_mode;
@@ -88,6 +92,21 @@ void fragment()
     // Color quantization
 	if (retro_color_quantization_mode == 2)
     	color = (round(color * retro_color_quantization_depth) / retro_color_quantization_depth);
+		
+	// Palette Mapping
+	if (retro_color_palette_enabled)
+		{
+			float pal_size = float(textureSize(retro_color_palette_texture, 0).x);
+				
+			// Luma
+			// Calculate base brightness + user offset (brightness)
+			// Apply Contrast (Now works with positive values!)
+			// Normalize luminance to ensures fragment colors align strictly with palette indices to eliminate sub-texel interpolation artifacts.
+			float luma = dot(color.rgb, vec3(0.299, 0.587, 0.114)) + retro_color_palette_brightness;
+			luma = clamp((luma - 0.5) * retro_color_palette_contrast + 0.5, 0.0, 1.0);
+			luma = floor(luma * (pal_size - 1.0) + 0.5) / (pal_size - 1.0);
+			color.rgb = texture(retro_color_palette_texture, vec2(luma, 0.5)).rgb;
+		}
 
     // Output
     ALBEDO = color;

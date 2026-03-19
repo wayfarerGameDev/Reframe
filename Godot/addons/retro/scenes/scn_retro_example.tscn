@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://b4eor8xcneiix" path="res://addons/retro/scripts/src_retro_settings.gd" id="1_whcre"]
 [ext_resource type="Shader" uid="uid://x85xdsx2dvb8" path="res://addons/retro/shaders/sdr_retro_post_process.gdshader" id="2_ooig5"]
 [ext_resource type="Texture2D" uid="uid://v6l4lv2buemc" path="res://addons/retro/textures/tex_retro_dither_matrix_ps1_normalized_4x4.png" id="3_akovk"]
+[ext_resource type="Texture2D" uid="uid://7bu31qqc54to" path="res://addons/retro/textures/tex_retro_pallet_nokia_4.png" id="3_fb1r1"]
 [ext_resource type="ArrayMesh" uid="uid://cl80o1ow8rxrj" path="res://addons/retro/meshes/mesh_retro_crate.obj" id="5_00ko0"]
 [ext_resource type="PackedScene" uid="uid://bpfmunsh25v5l" path="res://addons/retro/particles/prt_retro_snow.tscn" id="5_56ciw"]
 [ext_resource type="Shader" uid="uid://612q4qpqb7gh" path="res://addons/retro/shaders/sdr_retro_object.gdshader" id="6_c7d13"]
@@ -37,13 +38,15 @@ shader_parameter/repeat_factor = 5.0
 transform = Transform3D(0.13492113, 0.3201018, 0.9377268, 0.23433709, 0.9092246, -0.34408894, -0.9627473, 0.2661688, 0.047661662, 0, 0, 0)
 script = ExtResource("1_whcre")
 post_processing_shader = ExtResource("2_ooig5")
+resolution_mode = 0
 resolution_aspect_mode = 1
 resolution = Vector2i(320, 240)
-texture_affine_mapping_strength = 0.6
 color_quantization_mode = 1
+color_palette_texture = ExtResource("3_fb1r1")
+color_palette_brightness = 3.755
 dithering_mode = 1
 dithering_matrix_texture = ExtResource("3_akovk")
-vertex_jitter_strength = 22.5
+vertex_jitter_strength = 0.0
 fog_mode = 0
 fog_start_end_distance = Vector2(1, 30)
 fog_depth_precision = 2048.0
