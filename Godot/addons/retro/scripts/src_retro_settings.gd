@@ -3,6 +3,7 @@ extends Node3D
 class_name RetroSettings
 
 enum ResolutionMode { Internal, Postprocessing }
+enum ResolutionAspectMode { Keep, Expand }
 enum VertexJitterMode { ClipSpace, ViewSapce }
 enum FogMode { None, ObjectVertex, ObjectPixel, Postprocessing }
 enum LightMode { None, ObjectVertex, ObjectPixel }
@@ -11,7 +12,8 @@ enum Mode { None, Object, Postprocessing }
 @export_group("Shader")
 @export var post_processing_shader: Shader = load("res://addons/retro/shaders/sdr_retro_post_process.gdshader")
 @export_group("Resolution")
-@export var resolution_mode : ResolutionMode = ResolutionMode.Postprocessing;
+@export var resolution_mode : ResolutionMode = ResolutionMode.Postprocessing
+@export var resolution_aspect_mode : ResolutionAspectMode = ResolutionAspectMode.Keep
 @export var resolution : Vector2i = Vector2i(640, 480)
 @export_group("Texture")
 @export var texture_affine_mapping_strength : float = 1
@@ -76,27 +78,32 @@ func _process(delta: float) -> void:
 	pass
 
 func project_settings_update() -> void:
-	# Runtime only
+	# Keep this from breaking the editor while you work
 	if Engine.is_editor_hint():
 		return
-	# Internal	
+		
+	# Window
+	var root_window := get_window()
+	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+	
+	# Target Aspect
+	var target_aspect = Window.CONTENT_SCALE_ASPECT_KEEP
+	if resolution_aspect_mode == ResolutionAspectMode.Expand:
+		target_aspect = Window.CONTENT_SCALE_ASPECT_EXPAND
+	
+	# Resolution mode (Internal)
 	if resolution_mode == ResolutionMode.Internal:
-		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
-		DisplayServer.window_set_size(resolution)
-		var vw := get_viewport()
-		# vw.scaling_3d_scale = 1.0
-		# vw.scaling_2d_scale = 1.0
-		# vw.canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_NEAREST
-		#vw.scaling = Viewport.SCALING_3D_MODE_MAX
-	# Other
-	if resolution_mode == ResolutionMode.Postprocessing:
-		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
-		var vw := get_viewport()
-		# vw.scaling = Viewport.SCALING_3D_MODE_MAX
-		# vw.scaling_2d_scale = 1.0
-		# vw.scaling_3d_scale = 1.0
-		# vw.size = Vector2i(1152, 648)
-
+		root_window.content_scale_size = resolution
+		root_window.content_scale_mode = Window.CONTENT_SCALE_MODE_VIEWPORT
+		root_window.content_scale_aspect = target_aspect
+		root_window.canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_NEAREST
+		
+	# Resolution mode (Postprocessing)
+	elif resolution_mode == ResolutionMode.Postprocessing:
+		root_window.content_scale_size = resolution
+		root_window.content_scale_mode = Window.CONTENT_SCALE_MODE_CANVAS_ITEMS 
+		root_window.content_scale_aspect = target_aspect
+		root_window.canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_LINEAR
 
 func global_shader_parameter_update() -> void:
 	# Basic globals
@@ -106,8 +113,6 @@ func global_shader_parameter_update() -> void:
 	RetroUtilities.global_shader_parameter_set("retro_color_quantization_depth", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, color_quantization_depth)
 	RetroUtilities.global_shader_parameter_set("retro_texture_affine_mapping_strength", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, texture_affine_mapping_strength)
 	RetroUtilities.global_shader_parameter_set("retro_texture_masking_threshold", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, texture_masking_threshold)
-	RetroUtilities.global_shader_parameter_set("retro_vertex_jitter_mode", RenderingServer.GLOBAL_VAR_TYPE_INT, vertex_jitter_mode)
-	RetroUtilities.global_shader_parameter_set("retro_vertex_jitter_strength", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, max(vertex_jitter_strength,0.00001))
 	RetroUtilities.global_shader_parameter_set("retro_vertex_z_fighting_reduction", RenderingServer.GLOBAL_VAR_TYPE_FLOAT,vertex_z_fighting_reduction)
 	RetroUtilities.global_shader_parameter_set("retro_fog_mode", RenderingServer.GLOBAL_VAR_TYPE_INT, fog_mode)
 	RetroUtilities.global_shader_parameter_set("retro_fog_color", RenderingServer.GLOBAL_VAR_TYPE_VEC4, fog_color)
@@ -117,6 +122,19 @@ func global_shader_parameter_update() -> void:
 	RetroUtilities.global_shader_parameter_set("retro_light_directional_direction", RenderingServer.GLOBAL_VAR_TYPE_VEC3, light_directional_direction)
 	RetroUtilities.global_shader_parameter_set("retro_light_directional_intensity", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, light_directional_intensity)
 	RetroUtilities.global_shader_parameter_set("retro_light_directional_color", RenderingServer.GLOBAL_VAR_TYPE_VEC4, light_directional_color)
+	
+	# Jitter
+	# Dynamically scale jitter for Internal resolution mode so it visually matches Postprocessing mode
+	var applied_jitter_strength = vertex_jitter_strength
+	if resolution_mode == ResolutionMode.Internal and not Engine.is_editor_hint():
+		# Use the actual OS window size, NOT the viewport's visible rect
+		# Prevent division by zero during weird window initialization states
+		var current_window_size = get_window().size
+		if current_window_size.x > 0:
+			var scale_factor = float(resolution.x) / float(current_window_size.x)
+			applied_jitter_strength *= scale_factor
+	RetroUtilities.global_shader_parameter_set("retro_vertex_jitter_mode", RenderingServer.GLOBAL_VAR_TYPE_INT, vertex_jitter_mode)
+	RetroUtilities.global_shader_parameter_set("retro_vertex_jitter_strength", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, max(applied_jitter_strength, 0.00001))
 	
 	# Dithering
 	RetroUtilities.global_shader_parameter_set("retro_dithering_mode", RenderingServer.GLOBAL_VAR_TYPE_INT, dithering_mode)
@@ -129,25 +147,56 @@ func global_shader_parameter_update() -> void:
 	if dithering_matrix_texture == null:
 		strength = 0.0
 	RetroUtilities.global_shader_parameter_set("retro_dithering_strength", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, strength)
-
-func post_processing_update() -> void:
+	
+func post_processing_update(force_rebuild: bool = false) -> void:
+	
+	# Validate postprocessing
+	var needs_post_processing: bool = (
+		resolution_mode == ResolutionMode.Postprocessing or
+		color_quantization_mode == Mode.Postprocessing or
+		dithering_mode == Mode.Postprocessing or
+		fog_mode == FogMode.Postprocessing
+	)
+	
+	#  Delet post processing
+	if not needs_post_processing:
+		if is_instance_valid(quad_instance):
+			quad_instance.queue_free()
+			quad_instance = null
+		# Catch any orphaned nodes by name just in case
+		else:
+			var orphan = get_node_or_null("ReframeRetroPostProcessScreenQuad")
+			if orphan: orphan.queue_free()
+		return
+	
+	# Rebuild
+	if force_rebuild and is_instance_valid(quad_instance):
+		quad_instance.queue_free()
+		quad_instance = null
+		
+	# MeshInstance3D (cleanup)
+	# @tool check: prevent orphan nodes from stacking up when reloading scenes
+	if not quad_instance:
+		quad_instance = get_node_or_null("ReframeRetroPostProcessScreenQuad")
+		
 	# MeshInstance3D
 	if not quad_instance or not is_instance_valid(quad_instance):
 		quad_instance = MeshInstance3D.new()
-		add_child(quad_instance)
 		quad_instance.name = "ReframeRetroPostProcessScreenQuad"
 		quad_instance.extra_cull_margin = INF
-		
-	# Mesh
-	var quad = QuadMesh.new()
-	quad.size = Vector2(2, 2)
-	quad.flip_faces = true
-	quad_instance.mesh = quad
-	
-	# Material
-	if post_processing_shader != null:
+		quad_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		quad_instance.gi_mode = GeometryInstance3D.GI_MODE_DISABLED
+		add_child(quad_instance)
+		# Mesh
+		var quad = QuadMesh.new()
+		quad.size = Vector2(2, 2)
+		quad.flip_faces = true
+		quad_instance.mesh = quad
+		# Material
 		var mat = ShaderMaterial.new()
-		mat.shader = post_processing_shader
 		quad_instance.material_override = mat
-	else:
-		quad_instance.material_override = null
+	
+	# Update Shader Dynamically
+	if quad_instance.material_override is ShaderMaterial:
+		if post_processing_shader != null: quad_instance.material_override.shader = post_processing_shader
+		else: quad_instance.material_override.shader = null

@@ -71,6 +71,7 @@ void vertex()
 	vec2 screen_space = (clip_space.xy / clip_space.w) * VIEWPORT_SIZE.xy;
 	_clip_space_w = max(clip_space.w, 0.001);
 
+
 	// Vertex Jitter
 	// Ps1 accurate jitter done in clip space
 	// Dependant on resolution

@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode unshaded, fog_disabled;
+render_mode unshaded, fog_disabled, depth_test_disabled, depth_draw_never;
 
 // Globals
 global uniform int retro_resolution_mode;
