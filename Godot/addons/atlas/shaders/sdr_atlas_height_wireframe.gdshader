@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode cull_back;
+render_mode cull_back, wireframe, unshaded;
 
 // Cascades
 uniform sampler2D cascade_heightmap_0 : repeat_enable;
@@ -30,3 +30,8 @@ void vertex()
 	vec4 cascade_sample_3 = texture(cascade_heightmap_3, cascade_uv_3) * cascade_world_3.z;
 	VERTEX.y += cascade_sample_0.g + cascade_sample_1.g + cascade_sample_2.g + cascade_sample_3.g;
 }
+
+void fragment() 
+{
+	ALBEDO = vec3(0.2, 0.5, 0.2); // Simple greenish terrain
+} 
