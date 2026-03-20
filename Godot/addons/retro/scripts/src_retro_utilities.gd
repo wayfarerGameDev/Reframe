@@ -1,8 +1,7 @@
 extends RefCounted
 class_name RetroUtilities
 
-static func global_shader_parameters_defaults() -> void:
-	# Basic globals
+static func global_shader_parameters_set_defaults() -> void:
 	global_shader_parameter_set("retro_resolution_mode", RenderingServer.GLOBAL_VAR_TYPE_INT, 0)
 	global_shader_parameter_set("retro_resolution", RenderingServer.GLOBAL_VAR_TYPE_VEC2, Vector2.ZERO)
 	global_shader_parameter_set("retro_color_quantization_mode", RenderingServer.GLOBAL_VAR_TYPE_INT, 0)
@@ -28,12 +27,93 @@ static func global_shader_parameters_defaults() -> void:
 	global_shader_parameter_set_texture("retro_dithering_matrix_texture", null)
 	global_shader_parameter_set("retro_dithering_matrix_size", RenderingServer.GLOBAL_VAR_TYPE_INT, 0)
 	global_shader_parameter_set("retro_dithering_strength", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, 0)
-	
 
+static func global_shader_parameters_set_by_resource(resource: RetroSettingsResource, window_size: Vector2i) -> void:
+	# Validate
+	if (resource == null):
+		return
+		
+	global_shader_parameters_set_resolution(resource.resolution_mode, resource.resolution)
+	global_shader_parameters_set_palette(resource.color_palette_texture, resource.color_palette_contrast, resource.color_palette_brightness)
+	global_shader_parameters_set_quantization(resource.color_quantization_mode, resource.color_quantization_depth)
+	global_shader_parameters_set_texture_behavior(resource.texture_affine_mapping_strength, resource.texture_masking_threshold, resource.vertex_z_fighting_reduction)
+	global_shader_parameters_set_vertex_jitter(resource.vertex_jitter_mode, resource.vertex_jitter_strength, resource.resolution_mode, resource.resolution, window_size)
+	global_shader_parameters_set_fog(resource.fog_mode, resource.fog_color, resource.fog_start_end_distance, resource.fog_depth_precision)
+	global_shader_parameters_set_lighting(resource.light_mode, resource.light_directional_direction, resource.light_directional_intensity, resource.light_directional_color)
+	global_shader_parameters_set_dithering(resource.dithering_mode, resource.dithering_matrix_texture, resource.dithering_strength)
+	
+static func global_shader_parameters_set_resolution(resolution_mode: int, resolution: Vector2) -> void:
+	# Editor preview override for Internal mode
+	var effective_resolution_mode = resolution_mode
+	if Engine.is_editor_hint() and resolution_mode == 0: # 0 = Internal
+		effective_resolution_mode = 1 # 1 = Postprocessing
+		
+	global_shader_parameter_set("retro_resolution_mode", RenderingServer.GLOBAL_VAR_TYPE_INT, effective_resolution_mode)
+	global_shader_parameter_set("retro_resolution", RenderingServer.GLOBAL_VAR_TYPE_VEC2, resolution)
+
+static func global_shader_parameters_set_palette(color_palette_texture: Texture2D, color_palette_contrast: float, color_palette_brightness: float) -> void:
+	global_shader_parameter_set("retro_color_palette_enabled", RenderingServer.GLOBAL_VAR_TYPE_BOOL, color_palette_texture != null)
+	global_shader_parameter_set_texture("retro_color_palette_texture", color_palette_texture)
+	global_shader_parameter_set("retro_color_palette_contrast", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, color_palette_contrast)
+	global_shader_parameter_set("retro_color_palette_brightness", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, color_palette_brightness * 0.1)
+
+static func global_shader_parameters_set_quantization(color_quantization_mode: int, color_quantization_depth: float) -> void:
+	global_shader_parameter_set("retro_color_quantization_mode", RenderingServer.GLOBAL_VAR_TYPE_INT, color_quantization_mode)
+	global_shader_parameter_set("retro_color_quantization_depth", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, color_quantization_depth)
+
+static func global_shader_parameters_set_texture_behavior(texture_affine_mapping_strength: float, texture_masking_threshold: float, vertex_z_fighting_reduction: float) -> void:
+	global_shader_parameter_set("retro_texture_affine_mapping_strength", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, texture_affine_mapping_strength)
+	global_shader_parameter_set("retro_texture_masking_threshold", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, texture_masking_threshold)
+	global_shader_parameter_set("retro_vertex_z_fighting_reduction", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, vertex_z_fighting_reduction)
+
+static func global_shader_parameters_set_vertex_jitter(vertex_jitter_mode: int, vertex_jitter_strength: float, resolution_mode: int, resolution: Vector2, window_size: Vector2i) -> void:
+	# Jitter
+	# Dynamically scale jitter for Internal resolution mode so it visually matches Postprocessing mode
+	var applied_jitter_strength = vertex_jitter_strength
+	if resolution_mode == 0 and not Engine.is_editor_hint(): # 0 = Internal
+		# Use the actual OS window size, NOT the viewport's visible rect
+		# Prevent division by zero during weird window initialization states
+		if window_size.x > 0:
+			var scale_factor = float(resolution.x) / float(window_size.x)
+			applied_jitter_strength *= scale_factor
+			
+	global_shader_parameter_set("retro_vertex_jitter_mode", RenderingServer.GLOBAL_VAR_TYPE_INT, vertex_jitter_mode)
+	global_shader_parameter_set("retro_vertex_jitter_strength", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, max(applied_jitter_strength, 0.00001))
+
+static func global_shader_parameters_set_fog(fog_mode: int, fog_color: Color, fog_start_end_distance: Vector2, fog_depth_precision: int) -> void:
+	global_shader_parameter_set("retro_fog_mode", RenderingServer.GLOBAL_VAR_TYPE_INT, fog_mode)
+	global_shader_parameter_set("retro_fog_color", RenderingServer.GLOBAL_VAR_TYPE_VEC4, fog_color)
+	global_shader_parameter_set("retro_fog_start_end_distance", RenderingServer.GLOBAL_VAR_TYPE_VEC2, fog_start_end_distance)
+	global_shader_parameter_set("retro_fog_depth_precision", RenderingServer.GLOBAL_VAR_TYPE_INT, fog_depth_precision)
+
+static func global_shader_parameters_set_lighting(light_mode: int, light_directional_direction: Vector3, light_directional_intensity: float, light_directional_color: Color) -> void:
+	global_shader_parameter_set("retro_light_mode", RenderingServer.GLOBAL_VAR_TYPE_INT, light_mode)
+	global_shader_parameter_set("retro_light_directional_direction", RenderingServer.GLOBAL_VAR_TYPE_VEC3, light_directional_direction)
+	global_shader_parameter_set("retro_light_directional_intensity", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, light_directional_intensity)
+	global_shader_parameter_set("retro_light_directional_color", RenderingServer.GLOBAL_VAR_TYPE_VEC4, light_directional_color)
+
+static func global_shader_parameters_set_dithering(dithering_mode: int, dithering_matrix_texture: Texture2D, dithering_strength: float) -> void:
+	# Dithering
+	var matrix_size := 4
+	if dithering_matrix_texture:
+		matrix_size = dithering_matrix_texture.get_width()
+	global_shader_parameter_set("retro_dithering_mode", RenderingServer.GLOBAL_VAR_TYPE_INT, dithering_mode)
+	global_shader_parameter_set_texture("retro_dithering_matrix_texture", dithering_matrix_texture)
+	global_shader_parameter_set("retro_dithering_matrix_size", RenderingServer.GLOBAL_VAR_TYPE_INT, matrix_size)
+	
+	var strength := dithering_strength
+	if dithering_matrix_texture == null:
+		strength = 0.0
+	global_shader_parameter_set("retro_dithering_strength", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, strength)
+	
 static func global_shader_parameter_set(name: String, type, value) -> void:
+	if Engine.is_editor_hint():
 		if RenderingServer.global_shader_parameter_get(name) == null:
 			RenderingServer.global_shader_parameter_add(name, type, value)
-		RenderingServer.global_shader_parameter_set(name, value)
+	elif not ProjectSettings.has_setting("shader_globals/" + name):
+		RenderingServer.global_shader_parameter_add(name, type, value)
+		
+	RenderingServer.global_shader_parameter_set(name, value)
 		
 static func global_shader_parameter_set_texture(name: String, tex: Texture2D) -> void:
 	# If null, use a small default texture
@@ -46,11 +126,13 @@ static func global_shader_parameter_set_texture(name: String, tex: Texture2D) ->
 		default_tex.create_from_image(img)
 		value = default_tex
 
-	# Update or add the shader global
-	if RenderingServer.global_shader_parameter_get(name) == null:
+	if Engine.is_editor_hint():
+		if RenderingServer.global_shader_parameter_get(name) == null:
+			RenderingServer.global_shader_parameter_add(name, RenderingServer.GLOBAL_VAR_TYPE_SAMPLER2D, value)
+	elif not ProjectSettings.has_setting("shader_globals/" + name):
 		RenderingServer.global_shader_parameter_add(name, RenderingServer.GLOBAL_VAR_TYPE_SAMPLER2D, value)
-	else:
-		RenderingServer.global_shader_parameter_set(name, value)
+		
+	RenderingServer.global_shader_parameter_set(name, value)
 
 static func generate_palette_texture(colors: Array[Color], save_path: String) -> void:
 	if colors.is_empty(): return

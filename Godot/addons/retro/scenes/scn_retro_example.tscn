@@ -1,59 +1,50 @@
 [gd_scene format=3 uid="uid://bstmic73abm6k"]
 
-[ext_resource type="Script" uid="uid://b4eor8xcneiix" path="res://addons/retro/scripts/src_retro_settings.gd" id="1_whcre"]
-[ext_resource type="Shader" uid="uid://x85xdsx2dvb8" path="res://addons/retro/shaders/sdr_retro_post_process.gdshader" id="2_ooig5"]
-[ext_resource type="Texture2D" uid="uid://v6l4lv2buemc" path="res://addons/retro/textures/tex_retro_dither_matrix_ps1_normalized_4x4.png" id="3_akovk"]
-[ext_resource type="Texture2D" uid="uid://7bu31qqc54to" path="res://addons/retro/textures/tex_retro_pallet_nokia_4.png" id="3_fb1r1"]
+[ext_resource type="Script" uid="uid://b4eor8xcneiix" path="res://addons/retro/scripts/src_retro_settings_node.gd" id="1_whcre"]
+[ext_resource type="Shader" uid="uid://x85xdsx2dvb8" path="res://addons/retro/shaders/sdr_retro_post_process.gdshader" id="2_akovk"]
+[ext_resource type="Script" uid="uid://dwbd6cftyh62" path="res://addons/retro/scripts/src_retro_settings_resource.gd" id="2_c7d13"]
+[ext_resource type="Texture2D" uid="uid://v6l4lv2buemc" path="res://addons/retro/textures/tex_retro_dither_matrix_ps1_normalized_4x4.png" id="2_fb1r1"]
 [ext_resource type="ArrayMesh" uid="uid://cl80o1ow8rxrj" path="res://addons/retro/meshes/mesh_retro_crate.obj" id="5_00ko0"]
 [ext_resource type="PackedScene" uid="uid://bpfmunsh25v5l" path="res://addons/retro/particles/prt_retro_snow.tscn" id="5_56ciw"]
 [ext_resource type="Shader" uid="uid://612q4qpqb7gh" path="res://addons/retro/shaders/sdr_retro_object.gdshader" id="6_c7d13"]
-[ext_resource type="Texture2D" uid="uid://bkaksukvbnvnv" path="res://addons/retro/textures/tex_retro_crate.png" id="7_akovk"]
+[ext_resource type="Texture2D" uid="uid://bkaksukvbnvnv" path="res://addons/retro/textures/tex_retro_crate.png" id="8_akovk"]
 [ext_resource type="ArrayMesh" uid="uid://b48ms3lwks8cj" path="res://addons/retro/meshes/mesh_retro_floor_10x10.obj" id="8_c7d13"]
-[ext_resource type="Texture2D" uid="uid://dbxx8jop17pc1" path="res://addons/retro/textures/tex_retro_floor_concrete.PNG" id="8_fb1r1"]
+[ext_resource type="Texture2D" uid="uid://dbxx8jop17pc1" path="res://addons/retro/textures/tex_retro_floor_concrete.PNG" id="10_fb1r1"]
+
+[sub_resource type="Resource" id="Resource_fb1r1"]
+script = ExtResource("2_c7d13")
+resolution_mode = 1
+color_palette_contrast = 0.01
+color_palette_brightness = 4.215
+metadata/_custom_type_script = "uid://dwbd6cftyh62"
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_fb1r1"]
 render_priority = 0
 shader = ExtResource("6_c7d13")
-shader_parameter/albedo_texture = ExtResource("7_akovk")
+shader_parameter/albedo_texture = ExtResource("8_akovk")
 shader_parameter/billboard_mode = 0
 shader_parameter/repeat_factor = 0.0
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_akovk"]
 render_priority = 0
 shader = ExtResource("6_c7d13")
-shader_parameter/albedo_texture = ExtResource("7_akovk")
+shader_parameter/albedo_texture = ExtResource("8_akovk")
 shader_parameter/billboard_mode = 0
 shader_parameter/repeat_factor = 0.0
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ewmc2"]
 render_priority = 0
 shader = ExtResource("6_c7d13")
-shader_parameter/albedo_texture = ExtResource("8_fb1r1")
+shader_parameter/albedo_texture = ExtResource("10_fb1r1")
 shader_parameter/billboard_mode = 0
 shader_parameter/repeat_factor = 5.0
 
 [node name="Scene" type="Node3D" unique_id=360406882]
 
-[node name="RetroSettings" type="Node3D" parent="." unique_id=1823916383 node_paths=PackedStringArray("light_directional_light")]
+[node name="RetroSettings" type="Node3D" parent="." unique_id=1823916383]
 transform = Transform3D(0.13492113, 0.3201018, 0.9377268, 0.23433709, 0.9092246, -0.34408894, -0.9627473, 0.2661688, 0.047661662, 0, 0, 0)
 script = ExtResource("1_whcre")
-post_processing_shader = ExtResource("2_ooig5")
-resolution_mode = 0
-resolution_aspect_mode = 1
-resolution = Vector2i(320, 240)
-color_quantization_mode = 1
-color_palette_texture = ExtResource("3_fb1r1")
-color_palette_brightness = 3.755
-dithering_mode = 1
-dithering_matrix_texture = ExtResource("3_akovk")
-vertex_jitter_strength = 0.0
-fog_mode = 0
-fog_start_end_distance = Vector2(1, 30)
-fog_depth_precision = 2048.0
-light_directional_light = NodePath("../DirectionalLight")
-light_directional_direction = Vector3(-0.14660297, 0.7936544, 0.5904408)
-light_directional_intensity = 100000000.0
-light_directional_color = Color(0.00037945056, 0.00037945056, 0.00037945056, 1)
+resource = SubResource("Resource_fb1r1")
 metadata/_custom_type_script = "uid://b4eor8xcneiix"
 
 [node name="DirectionalLight" type="DirectionalLight3D" parent="." unique_id=984969227]
@@ -63,7 +54,7 @@ transform = Transform3D(0.7437384, 0.65219694, 0.14660297, 0.48197812, -0.371227
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.7691307, 3.650188, -8.918306)
 
 [node name="Crate" type="MeshInstance3D" parent="." unique_id=264904257]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.8144326, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.015457, 0)
 mesh = ExtResource("5_00ko0")
 surface_material_override/0 = SubResource("ShaderMaterial_fb1r1")
 
@@ -74,7 +65,6 @@ radial_segments = 20
 rings = 20
 material = SubResource("ShaderMaterial_akovk")
 
-[node name="Floor" type="MeshInstance3D" parent="." unique_id=1702570940]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.8217154, 0)
-material_override = SubResource("ShaderMaterial_ewmc2")
+[node name="Floor" type="MeshInstance3D" parent="." unique_id=1776481370]
 mesh = ExtResource("8_c7d13")
+surface_material_override/0 = SubResource("ShaderMaterial_ewmc2")

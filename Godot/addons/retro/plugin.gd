@@ -8,7 +8,7 @@ var editor_selection: EditorSelection
 func _enter_tree():
 	
 	# Initialize default shader parameters
-	RetroUtilities.global_shader_parameters_defaults()
+	RetroUtilities.global_shader_parameters_set_defaults()
 	
 	# Godot styles
 	var editor_base = get_editor_interface().get_base_control()
@@ -74,7 +74,7 @@ func _on_selection_changed():
 	var selected_nodes = editor_selection.get_selected_nodes()
 	var is_retro_selected = false
 	for node in selected_nodes:
-		if node is RetroSettings:
+		if node is RetroSettingsNode3D:
 			is_retro_selected = true
 			break
 			
