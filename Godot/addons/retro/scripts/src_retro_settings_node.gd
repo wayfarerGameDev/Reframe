@@ -90,7 +90,7 @@ func project_settings_update() -> void:
 		root_window.canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_LINEAR
 
 func global_shader_parameter_update() -> void:
-	RetroUtilities.global_shader_parameters_set_by_resource(resource,get_window().size)
+	RetroUtilities.global_shader_parameters_set_by_resource(resource, get_window().size)
 	
 func post_processing_update(force_rebuild: bool = false) -> void:
 	# Validate
@@ -115,7 +115,8 @@ func post_processing_update(force_rebuild: bool = false) -> void:
 		resource.color_quantization_mode == Mode.Postprocessing or
 		resource.dithering_mode == Mode.Postprocessing or
 		resource.fog_mode == FogMode.Postprocessing or
-		(is_enabled and Engine.is_editor_hint())
+		(is_enabled and Engine.is_editor_hint()) or
+		true == true
 	)
 	
 	# Editor bypass override

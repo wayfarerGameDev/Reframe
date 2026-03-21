@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://bstmic73abm6k"]
 
 [ext_resource type="Script" uid="uid://b4eor8xcneiix" path="res://addons/retro/scripts/src_retro_settings_node.gd" id="1_whcre"]
-[ext_resource type="Shader" uid="uid://x85xdsx2dvb8" path="res://addons/retro/shaders/sdr_retro_post_process.gdshader" id="2_akovk"]
-[ext_resource type="Script" uid="uid://dwbd6cftyh62" path="res://addons/retro/scripts/src_retro_settings_resource.gd" id="2_c7d13"]
 [ext_resource type="Texture2D" uid="uid://v6l4lv2buemc" path="res://addons/retro/textures/tex_retro_dither_matrix_ps1_normalized_4x4.png" id="2_fb1r1"]
+[ext_resource type="Shader" uid="uid://x85xdsx2dvb8" path="res://addons/retro/shaders/sdr_retro_post_process.gdshader" id="3_ewmc2"]
+[ext_resource type="Script" uid="uid://dwbd6cftyh62" path="res://addons/retro/scripts/src_retro_settings_resource.gd" id="4_4e1fl"]
 [ext_resource type="ArrayMesh" uid="uid://cl80o1ow8rxrj" path="res://addons/retro/meshes/mesh_retro_crate.obj" id="5_00ko0"]
 [ext_resource type="PackedScene" uid="uid://bpfmunsh25v5l" path="res://addons/retro/particles/prt_retro_snow.tscn" id="5_56ciw"]
 [ext_resource type="Shader" uid="uid://612q4qpqb7gh" path="res://addons/retro/shaders/sdr_retro_object.gdshader" id="6_c7d13"]
@@ -11,11 +11,11 @@
 [ext_resource type="ArrayMesh" uid="uid://b48ms3lwks8cj" path="res://addons/retro/meshes/mesh_retro_floor_10x10.obj" id="8_c7d13"]
 [ext_resource type="Texture2D" uid="uid://dbxx8jop17pc1" path="res://addons/retro/textures/tex_retro_floor_concrete.PNG" id="10_fb1r1"]
 
-[sub_resource type="Resource" id="Resource_fb1r1"]
-script = ExtResource("2_c7d13")
-resolution_mode = 1
-color_palette_contrast = 0.01
-color_palette_brightness = 4.215
+[sub_resource type="Resource" id="Resource_n1pag"]
+script = ExtResource("4_4e1fl")
+color_palette_contrast = 1.444
+color_palette_brightness = 1.015
+vhs_tape_dropout_intensity = 0.035
 metadata/_custom_type_script = "uid://dwbd6cftyh62"
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_fb1r1"]
@@ -44,7 +44,7 @@ shader_parameter/repeat_factor = 5.0
 [node name="RetroSettings" type="Node3D" parent="." unique_id=1823916383]
 transform = Transform3D(0.13492113, 0.3201018, 0.9377268, 0.23433709, 0.9092246, -0.34408894, -0.9627473, 0.2661688, 0.047661662, 0, 0, 0)
 script = ExtResource("1_whcre")
-resource = SubResource("Resource_fb1r1")
+resource = SubResource("Resource_n1pag")
 metadata/_custom_type_script = "uid://b4eor8xcneiix"
 
 [node name="DirectionalLight" type="DirectionalLight3D" parent="." unique_id=984969227]
