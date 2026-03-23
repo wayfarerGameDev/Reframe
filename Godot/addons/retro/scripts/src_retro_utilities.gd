@@ -3,15 +3,15 @@ class_name RetroUtilities
 
 static func global_shader_parameters_set_defaults() -> void:
 	global_shader_parameters_set_resolution(0, Vector2.ZERO)
-	global_shader_parameters_set_palette(null, 1.0, 1.0)
-	global_shader_parameters_set_quantization(0, 0.0)
+	global_shader_parameters_set_сolor_palette(null, 0, 1.0, 1.0)
+	global_shader_parameters_set_color_quantization(0, 0.0)
 	global_shader_parameters_set_texture_behavior(0.0, 0.5, 0.0)
 	global_shader_parameters_set_vertex_jitter(1, 0.00001, 0, Vector2.ZERO, Vector2i.ZERO)
 	global_shader_parameters_set_fog(0, Color.BLACK, Vector2.ZERO, 0)
 	global_shader_parameters_set_lighting(0, Vector3(0, 1, 0), 1.0, Color.BLACK)
 	global_shader_parameters_set_dithering(0, null, 0.0)
-	global_shader_parameters_set_crt(0.0, 5.0, 1.0, 0.5, 0.35, 0.4)
-	global_shader_parameters_set_vhs(0.15, 0.1, 0.4, 0.15, 0.3)
+	global_shader_parameters_set_crt(false, 0.0, 5.0, 1.0, 0.5, 0.35, 0.4)
+	global_shader_parameters_set_vhs(false, 0.15, 0.1, 0.4, 0.15, 0.3)
 	
 static func global_shader_parameters_set_by_resource(resource: RetroSettingsResource, window_size: Vector2i) -> void:
 	# Validate
@@ -20,15 +20,15 @@ static func global_shader_parameters_set_by_resource(resource: RetroSettingsReso
 		return
 		
 	global_shader_parameters_set_resolution(resource.resolution_mode, resource.resolution)
-	global_shader_parameters_set_palette(resource.color_palette_texture, resource.color_palette_contrast, resource.color_palette_brightness)
-	global_shader_parameters_set_quantization(resource.color_quantization_mode, resource.color_quantization_depth)
+	global_shader_parameters_set_сolor_palette(resource.color_palette_texture, resource.color_palette_strength, resource.color_palette_contrast, resource.color_palette_brightness)
+	global_shader_parameters_set_color_quantization(resource.color_quantization_mode, resource.color_quantization_depth)
 	global_shader_parameters_set_texture_behavior(resource.texture_affine_mapping_strength, resource.texture_masking_threshold, resource.vertex_z_fighting_reduction)
 	global_shader_parameters_set_vertex_jitter(resource.vertex_jitter_mode, resource.vertex_jitter_strength, resource.resolution_mode, resource.resolution, window_size)
 	global_shader_parameters_set_fog(resource.fog_mode, resource.fog_color, resource.fog_start_end_distance, resource.fog_depth_precision)
 	global_shader_parameters_set_lighting(resource.light_mode, resource.light_directional_direction, resource.light_directional_intensity, resource.light_directional_color)
 	global_shader_parameters_set_dithering(resource.dithering_mode, resource.dithering_matrix_texture, resource.dithering_strength)
-	global_shader_parameters_set_crt(resource.crt_curvature_strength,resource.crt_chromatic_aberration_strength,resource.crt_scanline_scale,resource.crt_scanline_intensity,resource.crt_vignette_radius,resource.crt_vignette_softness)
-	global_shader_parameters_set_vhs(resource.vhs_tracking_strength, resource.vhs_tape_noise_intensity, resource.vhs_chroma_bleeding_strength, resource.vhs_tape_dropout_intensity, resource.vhs_signal_ringing_strength)
+	global_shader_parameters_set_crt(resource.crt_enabled, resource.crt_curvature_strength,resource.crt_chromatic_aberration_strength,resource.crt_scanline_scale,resource.crt_scanline_intensity,resource.crt_vignette_radius,resource.crt_vignette_softness)
+	global_shader_parameters_set_vhs(resource.vhs_enabled, resource.vhs_tracking_strength, resource.vhs_tape_noise_intensity, resource.vhs_chroma_bleeding_strength, resource.vhs_tape_dropout_intensity, resource.vhs_signal_ringing_strength)
 	
 static func global_shader_parameters_set_resolution(resolution_mode: int, resolution: Vector2) -> void:
 	# Editor preview override for Internal mode
@@ -39,13 +39,14 @@ static func global_shader_parameters_set_resolution(resolution_mode: int, resolu
 	global_shader_parameter_set("retro_resolution_mode", RenderingServer.GLOBAL_VAR_TYPE_INT, effective_resolution_mode)
 	global_shader_parameter_set("retro_resolution", RenderingServer.GLOBAL_VAR_TYPE_VEC2, resolution)
 
-static func global_shader_parameters_set_palette(color_palette_texture: Texture2D, color_palette_contrast: float, color_palette_brightness: float) -> void:
+static func global_shader_parameters_set_сolor_palette(color_palette_texture: Texture2D, color_palette_strength, color_palette_contrast: float, color_palette_brightness: float) -> void:
 	global_shader_parameter_set("retro_color_palette_enabled", RenderingServer.GLOBAL_VAR_TYPE_BOOL, color_palette_texture != null)
 	global_shader_parameter_set_texture("retro_color_palette_texture", color_palette_texture)
+	global_shader_parameter_set("retro_color_palette_strength", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, color_palette_strength)
 	global_shader_parameter_set("retro_color_palette_contrast", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, color_palette_contrast)
 	global_shader_parameter_set("retro_color_palette_brightness", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, color_palette_brightness * 0.1)
 
-static func global_shader_parameters_set_quantization(color_quantization_mode: int, color_quantization_depth: float) -> void:
+static func global_shader_parameters_set_color_quantization(color_quantization_mode: int, color_quantization_depth: float) -> void:
 	global_shader_parameter_set("retro_color_quantization_mode", RenderingServer.GLOBAL_VAR_TYPE_INT, color_quantization_mode)
 	global_shader_parameter_set("retro_color_quantization_depth", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, color_quantization_depth)
 
@@ -94,7 +95,9 @@ static func global_shader_parameters_set_dithering(dithering_mode: int, ditherin
 		strength = 0.0
 	global_shader_parameter_set("retro_dithering_strength", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, strength)
 
-static func global_shader_parameters_set_crt(curvature_strength: float, chromatic_aberration_strength: float, scanline_scale: float, scanline_intensity: float, vignette_radius: float, vignette_softness: float) -> void:
+static func global_shader_parameters_set_crt(enabled : bool, curvature_strength: float, chromatic_aberration_strength: float, scanline_scale: float, scanline_intensity: float, vignette_radius: float, vignette_softness: float) -> void:
+	global_shader_parameter_set("retro_crt_enabled", RenderingServer.GLOBAL_VAR_TYPE_BOOL, enabled)
+	global_shader_parameter_set("retro_crt_curvature_strength", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, curvature_strength)
 	global_shader_parameter_set("retro_crt_curvature_strength", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, curvature_strength)
 	global_shader_parameter_set("retro_crt_chromatic_aberration_strength", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, chromatic_aberration_strength)
 	global_shader_parameter_set("retro_crt_scanline_scale", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, scanline_scale)
@@ -102,7 +105,8 @@ static func global_shader_parameters_set_crt(curvature_strength: float, chromati
 	global_shader_parameter_set("retro_crt_vignette_radius", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, vignette_radius)
 	global_shader_parameter_set("retro_crt_vignette_softness", RenderingServer.GLOBAL_VAR_TYPE_FLOAT,vignette_softness)
 
-static func global_shader_parameters_set_vhs(tracking_strength: float, tape_noise_intensity: float, chroma_bleeding_strength: float, tape_dropout_intensity: float, signal_ringing_strength: float) -> void:
+static func global_shader_parameters_set_vhs(enabled : bool, tracking_strength: float, tape_noise_intensity: float, chroma_bleeding_strength: float, tape_dropout_intensity: float, signal_ringing_strength: float) -> void:
+	global_shader_parameter_set("retro_vhs_enabled", RenderingServer.GLOBAL_VAR_TYPE_BOOL, enabled)
 	global_shader_parameter_set("retro_vhs_tracking_strength", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, tracking_strength)
 	global_shader_parameter_set("retro_vhs_tape_noise_intensity", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, tape_noise_intensity)
 	global_shader_parameter_set("retro_vhs_chroma_bleeding_strength", RenderingServer.GLOBAL_VAR_TYPE_FLOAT, chroma_bleeding_strength)

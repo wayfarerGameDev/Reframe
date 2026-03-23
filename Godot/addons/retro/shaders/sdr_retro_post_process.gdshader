@@ -7,6 +7,7 @@ global uniform vec2 retro_resolution;
 global uniform int retro_color_quantization_mode;
 global uniform float retro_color_quantization_depth;
 global uniform bool retro_color_palette_enabled;
+global uniform float retro_color_palette_strength;
 global uniform float retro_color_palette_contrast;
 global uniform float retro_color_palette_brightness;
 global uniform sampler2D retro_color_palette_texture : source_color, filter_nearest;
@@ -18,12 +19,14 @@ global uniform int retro_fog_mode;
 global uniform vec4  retro_fog_color;
 global uniform vec2  retro_fog_start_end_distance;
 global uniform int retro_fog_depth_precision;
+global uniform bool retro_crt_enabled;
 global uniform float retro_crt_curvature_strength;
 global uniform float retro_crt_chromatic_aberration_strength;
 global uniform float retro_crt_scanline_scale;
 global uniform float retro_crt_scanline_intensity;
 global uniform float retro_crt_vignette_radius;
 global uniform float retro_crt_vignette_softness;
+global uniform bool retro_vhs_enabled;
 global uniform float retro_vhs_tracking_strength;
 global uniform float retro_vhs_tape_noise_intensity;
 global uniform float retro_vhs_chroma_bleeding_strength;
@@ -56,7 +59,7 @@ void fragment()
 	// VHS (Tracking Wobble)
 	// Simulates the horizontal "tearing" and jitter found at the bottom of 
 	// poor quality VHS tapes (Head Switching Noise).
-	if (retro_vhs_tracking_strength > 0.0)
+	if (retro_vhs_enabled && retro_vhs_tracking_strength > 0.0)
 	{
 		// Create a "jitter" using high-frequency sine waves.
 		// We use a combination of TIME and uv.y to make it look erratic.
@@ -72,7 +75,8 @@ void fragment()
 	}
 	
 	// CRT (Curvature)
-	float crt_curvature_mask;
+	float crt_curvature_mask = 1.0;
+	if (retro_crt_enabled)
 	{
 		// 1. Shift UVs so 0,0 is the center of the screen (range -1.0 to 1.0)
 		// 2. Calculate how hard the screen pulls away from the viewer.
@@ -106,6 +110,7 @@ void fragment()
 	vec3 color; // Sample this later so we can do chromatic aberration
 	
 	// CRT Chromatic Aberration
+	if (retro_crt_enabled)
 	{
 		// Old cathode ray tubes fired separate Red, Green, and Blue electron beams.
 		// We simulate edge misalignment by sampling the screen three separate times, 
@@ -116,12 +121,16 @@ void fragment()
 		float crt_b = texture(SCREEN_TEXTURE, uv + ca_offset).b;
 		color = vec3(crt_r, crt_g, crt_b);
 	}
+	else
+	{
+		color = texture(SCREEN_TEXTURE, uv).rgb;
+	}
 	
 	// VHS (Chroma Bleeding)
 	// Analog formats had low bandwidth for color but high bandwidth for brightness.
 	// We simulate this by stepping into the YIQ color space (used by NTSC TVs), 
 	// shifting the color channels horizontally, and recombining with original brightness.
-	if (retro_vhs_chroma_bleeding_strength > 0.0)
+	if (retro_vhs_enabled && retro_vhs_chroma_bleeding_strength > 0.0)
 	{
 		// Calculate the smear distance relative to our chunky retro resolution.
 		float bleed_offset = (retro_vhs_chroma_bleeding_strength * 3.0) / retro_resolution.x; 
@@ -148,7 +157,7 @@ void fragment()
 	// VHS (Signal Ringing)
 	// Simulates the electrical "overshoot" or ghosting seen on high-contrast edges.
 	// This creates a faint, blurry echo of the image shifted slightly to the right.
-	if (retro_vhs_signal_ringing_strength > 0.0)
+	if (retro_vhs_enabled && retro_vhs_signal_ringing_strength > 0.0)
 	{
 		// Define the offset for the "ghost" image.
 		// We shift to the left (uv - offset) so the ghost appears to the right of the objects.
@@ -232,12 +241,12 @@ void fragment()
 		luma = floor(luma * (pal_size - 1.0) + 0.5) / (pal_size - 1.0);
 		
 		// Read the final color from the 1D palette texture.
-		color.rgb = texture(retro_color_palette_texture, vec2(luma, 0.5)).rgb;
+		color.rgb = mix(color.rgb,texture(retro_color_palette_texture, vec2(luma, 0.5)).rgb, retro_color_palette_strength);
 	}
 	
 	// VHS (Tape Noise / Snow)
 	// Simulates the grainy, flickering static caused by magnetic interference.
-	if (retro_vhs_tape_noise_intensity > 0.0)
+	if (retro_vhs_enabled && retro_vhs_tape_noise_intensity > 0.0)
 	{
 		// Generate high-frequency pseudo-random noise.
 		// Adding TIME ensures the static flickers every frame.
@@ -260,7 +269,7 @@ void fragment()
 	
 	// VHS (Tape Dropouts)
 	// Simulates physical damage, dust, or creases on the magnetic tape.
-	if (retro_vhs_tape_dropout_intensity > 0.0)
+	if (retro_vhs_enabled && retro_vhs_tape_dropout_intensity > 0.0)
 	{
 		// Group the noise into chunky horizontal rows based on retro resolution.
 		// This prevents microscopic sub-pixel lines that your monitor struggles to render.
@@ -292,6 +301,7 @@ void fragment()
 	}
 	
 	// CRT (Scanlines)
+	if (retro_crt_enabled)
 	{
 		float scanline_mask = 1.0;
 		
@@ -325,9 +335,12 @@ void fragment()
 	// CRT (Vignette)
 	// Darkens the corners of the screen based on distance from the center (0.5, 0.5)
 	// Uses smoothstep for a natural, analog lens falloff.
-	float dist = distance(uv, vec2(0.5));
-	float vignette = smoothstep(retro_crt_vignette_radius, retro_crt_vignette_radius + retro_crt_vignette_softness, dist);
-	color.rgb = mix(color.rgb, vec3(0.0), vignette);
+	if (retro_crt_enabled)
+	{
+		float dist = distance(uv, vec2(0.5));
+		float vignette = smoothstep(retro_crt_vignette_radius, retro_crt_vignette_radius + retro_crt_vignette_softness, dist);
+		color.rgb = mix(color.rgb, vec3(0.0), vignette);
+	}
 	
 	// Output
 	ALBEDO = color * crt_curvature_mask;
